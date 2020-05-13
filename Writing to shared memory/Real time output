@@ -1,0 +1,66 @@
+#include <iostream>
+#include <pthread.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+int main()
+{
+    int fileDir, unlink;
+    bool run = true;
+    time_t my_time;
+    char buf[256];
+    char *outputTime;
+
+    struct tm *ltime; // Local time
+
+    size_t sizeTime, sizeBuf, sizeAll;
+
+    char ref = '\n';
+    char *newLine;
+    newLine = &ref;
+
+    fileDir = shm_open("/testSHM", O_CREAT | O_RDWR, 0600); // Open and create a file if it does not already exist
+
+    while (run)
+    {
+        fgets(buf, 256, stdin);
+
+        time(&my_time);
+        ltime = localtime(&my_time);
+        outputTime = asctime(ltime); // Reset the time
+
+        sizeBuf = strlen(buf);
+        sizeTime = strlen(outputTime);
+        sizeAll = sizeBuf + sizeTime;
+
+        if ((outputTime[sizeTime - 1]) == '\n')
+        {
+            (outputTime[sizeTime - 1]) = '\0'; // Ignore the newline
+        }
+
+        if ((buf[sizeBuf - 1] == '\n') && (sizeBuf == 1)) // Exit loop when user enters blank space (for now)
+        {
+            run = false;
+        }
+        else
+        {
+            pwrite(fileDir, newLine, 1, sizeAll); // Add a new line
+
+            write(fileDir, outputTime, sizeTime - 1);
+            pwrite(fileDir, buf, sizeBuf - 1, sizeTime - 1); // Write in the file offset by sizeTime
+
+            pwrite(fileDir, newLine, 1, sizeAll); // Add a new line
+            memset(buf, 0, sizeBuf);              // Clear buf
+        }
+    }
+
+    close(fileDir);
+
+    unlink = shm_unlink("/testSHM");
+
+    return (0);
+}
