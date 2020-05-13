@@ -1,0 +1,29 @@
+#include <iostream>
+#include <pthread.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+
+//to run: g++ shmTest.cpp -o shmTest -lrt
+
+int main(){
+    int fileDir, unlink;
+
+    char buf[256];
+    
+    fileDir = shm_open("/testSHM", O_CREAT | O_RDWR, 0600); // open and create a file if it does not already exist
+
+    scanf("%[^\n]256s", buf); // read everything from the next 127 characters until it gets a newline
+
+    write(fileDir, buf, strlen(buf)); // write to the file of a length of the inputted string
+
+    close(fileDir);
+
+    //unlink = shm_unlink("/testSHM");
+
+    return(0);
+
+
+}
