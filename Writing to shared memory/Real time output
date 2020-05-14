@@ -1,27 +1,26 @@
+/*
+Sarah Chow
+Adds to a file in shared memory, file shows the time stamp and inputted words (max 256 characters)
+*/
+
 #include <iostream>
 #include <pthread.h>
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdio.h>
 #include <string.h>
 #include <time.h>
 
 int main()
 {
-    int fileDir, unlink;
+    int fileDir, unlink, bytesWritten;
     bool run = true;
-    time_t my_time;
     char buf[256];
-    char *outputTime;
-
-    struct tm *ltime; // Local time
-
     size_t sizeTime, sizeBuf, sizeAll;
 
-    char ref = '\n';
-    char *newLine;
-    newLine = &ref;
+    time_t my_time;
+    char *outputTime;
+    struct tm *ltime; // Local time
 
     fileDir = shm_open("/testSHM", O_CREAT | O_RDWR, 0600); // Open and create a file if it does not already exist
 
@@ -29,32 +28,37 @@ int main()
     {
         fgets(buf, 256, stdin);
 
-        time(&my_time);
-        ltime = localtime(&my_time);
-        outputTime = asctime(ltime); // Reset the time
-
         sizeBuf = strlen(buf);
-        sizeTime = strlen(outputTime);
-        sizeAll = sizeBuf + sizeTime;
-
-        if ((outputTime[sizeTime - 1]) == '\n')
-        {
-            (outputTime[sizeTime - 1]) = '\0'; // Ignore the newline
-        }
 
         if ((buf[sizeBuf - 1] == '\n') && (sizeBuf == 1)) // Exit loop when user enters blank space (for now)
         {
             run = false;
         }
-        else
+        else // Keep loop going
         {
-            pwrite(fileDir, newLine, 1, sizeAll); // Add a new line
+            sizeBuf -= 1; // Ignore the newline from the user
 
-            write(fileDir, outputTime, sizeTime - 1);
-            pwrite(fileDir, buf, sizeBuf - 1, sizeTime - 1); // Write in the file offset by sizeTime
+            // Reset the time
+            time(&my_time);
+            ltime = localtime(&my_time);
+            outputTime = asctime(ltime);
 
-            pwrite(fileDir, newLine, 1, sizeAll); // Add a new line
-            memset(buf, 0, sizeBuf);              // Clear buf
+            // Get the sizes
+            sizeTime = strlen(outputTime);
+            sizeAll = sizeBuf + sizeTime;
+
+            if (outputTime[sizeTime - 1] != '\t')
+            {
+                outputTime[sizeTime - 1] = '\t'; // Insert a tab after timestamp
+            }
+
+            write(fileDir, outputTime, sizeTime); // sizeTime + 1 since added the newline
+
+            buf[sizeBuf] = '\n'; // Add a new line end of user input
+
+            write(fileDir, buf, sizeBuf + 1); // Write in the file offset by sizeTime
+
+            memset(buf, 0, sizeBuf); // Clear the buffer
         }
     }
 
