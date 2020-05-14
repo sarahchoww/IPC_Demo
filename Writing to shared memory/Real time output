@@ -56,7 +56,7 @@ int main()
 
             buf[sizeBuf] = '\n'; // Add a new line end of user input
 
-            write(fileDir, buf, sizeBuf + 1); // Write in the file offset by sizeTime
+            write(fileDir, buf, sizeBuf + 1); // Write in the file of size sizeBuf + 1 due to added newline
 
             memset(buf, 0, sizeBuf); // Clear the buffer
         }
