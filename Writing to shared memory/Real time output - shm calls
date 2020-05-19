@@ -1,0 +1,121 @@
+/*
+Sarah Chow
+Adds to a file in shared memory, file shows the time stamp and inputted words (max 256 characters)
+*/
+
+#include <iostream>
+#include <pthread.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <ctime>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+
+struct memory_data
+{
+    //char *time;
+    char input;
+};
+
+std::ostream &operator<<(std::ostream &os, struct tm const *ltime){
+    return os << ltime->tm_sec;
+} // Override insertion operator
+
+int main()
+{
+    int fileDir, bytesWritten, trunResult, SIZE = 256;
+    bool run = true;
+    
+    char buffer[SIZE];
+    char *buf = &buffer;
+
+    size_t sizeTime, sizeBuf;
+    const char *fileName = "/testSHM"; // pointing to where /testSHM is in memory
+
+    time_t my_time;
+    char *outputTime = nullptr;
+    struct tm *ltime; // Local time
+
+    struct memory_data *addr;
+
+
+    if ((fileDir = shm_open(fileName, O_CREAT | O_RDWR, S_IRWXU | S_IRWXG)) == -1)
+    {
+        std::cout << "file opening error";
+        exit(1);
+    } // Open and create a file if it does not already exist
+
+
+    if ((trunResult = ftruncate(fileDir, sizeof(struct memory_data))) == -1)
+    {
+        std::cout << trunResult << "\ttrunResult\n";
+
+        return (1);
+    }
+    
+
+    while (run)
+    {
+        fgets(buffer, sizeof(buffer), stdin);
+
+        sizeBuf = strlen(buf);
+
+
+        std::cout << buf;
+
+        if ((buf[sizeBuf - 1] == '\n') && (sizeBuf == 1)) // Exit loop when user enters blank space (for now)
+        {
+            run = false;
+        }
+        else // Keep loop going
+        {
+            sizeBuf -= 1; // Ignore the newline from the user
+
+            // Reset the time
+            time(&my_time);              // Current time put into my_time
+            ltime = localtime(&my_time); // Return the 'struct tm' representation of timer in local time zone
+           
+            outputTime = asctime(ltime); // Takes in a pointer, converts to string
+            //std::cout << ltime;
+
+            // Get the sizes
+            sizeTime = strlen(outputTime);
+
+            if ((addr = (struct memory_data *) mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+            {
+                std::cout << "mmap failed\n" << addr << std::endl;
+
+                return (1);
+            }
+            
+
+
+            //addr->time = outputTime;
+
+            //addr->input = (char) buf;
+           // std::cout << buffer;
+
+            /*for (int i = 0; i < sizeBuf; i++){
+                std::cout << std::hex << (int)(addr->input[i]) << " ";
+            }
+*/
+            memset(buf, 0, sizeBuf); // Clear the buffer
+
+            
+        }
+    }
+
+    if (munmap(addr, sizeof(struct memory_data)) == -1)
+    {
+        std::cout << "munmap failed";
+    }
+
+    close(fileDir);
+
+    shm_unlink("/testSHM");
+
+    return (0);
+}
