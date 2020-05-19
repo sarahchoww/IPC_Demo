@@ -29,8 +29,8 @@ int main()
     int fileDir, bytesWritten, trunResult, SIZE = 256;
     bool run = true;
     
-    char buffer[SIZE];
-    char *buf = &buffer;
+    char buffer[256];
+    char *buf; // Is this needed?
 
     size_t sizeTime, sizeBuf;
     const char *fileName = "/testSHM"; // pointing to where /testSHM is in memory
@@ -61,12 +61,10 @@ int main()
     {
         fgets(buffer, sizeof(buffer), stdin);
 
-        sizeBuf = strlen(buf);
+        sizeBuf = strlen(buffer);
 
 
-        std::cout << buf;
-
-        if ((buf[sizeBuf - 1] == '\n') && (sizeBuf == 1)) // Exit loop when user enters blank space (for now)
+        if ((buffer[sizeBuf - 1] == '\n') && (sizeBuf == 1)) // Exit loop when user enters blank space (for now)
         {
             run = false;
         }
@@ -93,16 +91,11 @@ int main()
             
 
 
-            //addr->time = outputTime;
+            addr->input = *buffer;
+            std::cout << *buffer; 
+// Not what looking for, pointer of buffer is only the first letter -- why?
 
-            //addr->input = (char) buf;
-           // std::cout << buffer;
-
-            /*for (int i = 0; i < sizeBuf; i++){
-                std::cout << std::hex << (int)(addr->input[i]) << " ";
-            }
-*/
-            memset(buf, 0, sizeBuf); // Clear the buffer
+            memset(buffer, 0, sizeBuf); // Clear the buffer
 
             
         }
