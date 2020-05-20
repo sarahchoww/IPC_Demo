@@ -12,25 +12,28 @@ Adds to a file in shared memory, file shows the time stamp and inputted words (m
 #include <ctime>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <semaphore.h>
 
+#define SIZE 256
+
+// Need to add a safe if input exceeds size
 
 struct memory_data
 {
-    //char *time;
-    char input;
+    char input[SIZE];
 };
 
-std::ostream &operator<<(std::ostream &os, struct tm const *ltime){
+std::ostream &operator<<(std::ostream &os, struct tm const *ltime)
+{
     return os << ltime->tm_sec;
 } // Override insertion operator
 
 int main()
 {
-    int fileDir, bytesWritten, trunResult, SIZE = 256;
+    int fileDir, trunResult;
     bool run = true;
-    
-    char buffer[256];
-    char *buf; // Is this needed?
+
+    char buffer[SIZE];
 
     size_t sizeTime, sizeBuf;
     const char *fileName = "/testSHM"; // pointing to where /testSHM is in memory
@@ -39,8 +42,8 @@ int main()
     char *outputTime = nullptr;
     struct tm *ltime; // Local time
 
-    struct memory_data *addr;
-
+    struct memory_data *addr = (struct memory_data *)malloc(sizeof(struct memory_data));
+    // Set size of addr
 
     if ((fileDir = shm_open(fileName, O_CREAT | O_RDWR, S_IRWXU | S_IRWXG)) == -1)
     {
@@ -48,14 +51,12 @@ int main()
         exit(1);
     } // Open and create a file if it does not already exist
 
-
     if ((trunResult = ftruncate(fileDir, sizeof(struct memory_data))) == -1)
     {
         std::cout << trunResult << "\ttrunResult\n";
 
         return (1);
     }
-    
 
     while (run)
     {
@@ -63,6 +64,8 @@ int main()
 
         sizeBuf = strlen(buffer);
 
+        memset(addr->input, 0, sizeof(char) * SIZE);
+        // Clear the input in the struct, do this after user inputs the new information
 
         if ((buffer[sizeBuf - 1] == '\n') && (sizeBuf == 1)) // Exit loop when user enters blank space (for now)
         {
@@ -70,34 +73,33 @@ int main()
         }
         else // Keep loop going
         {
-            sizeBuf -= 1; // Ignore the newline from the user
+
+            if (buffer[sizeBuf - 1] == '\n')
+            {
+                buffer[sizeBuf - 1] = '\0'; // Rid of newline
+            }
 
             // Reset the time
             time(&my_time);              // Current time put into my_time
             ltime = localtime(&my_time); // Return the 'struct tm' representation of timer in local time zone
-           
+
             outputTime = asctime(ltime); // Takes in a pointer, converts to string
             //std::cout << ltime;
 
             // Get the sizes
             sizeTime = strlen(outputTime);
 
-            if ((addr = (struct memory_data *) mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+            if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
             {
-                std::cout << "mmap failed\n" << addr << std::endl;
+                std::cout << "mmap failed\n"
+                          << addr << std::endl;
 
                 return (1);
             }
-            
 
-
-            addr->input = *buffer;
-            std::cout << *buffer; 
-// Not what looking for, pointer of buffer is only the first letter -- why?
+            strcpy(addr->input, buffer);
 
             memset(buffer, 0, sizeBuf); // Clear the buffer
-
-            
         }
     }
 
@@ -105,6 +107,8 @@ int main()
     {
         std::cout << "munmap failed";
     }
+
+    free(addr); // Close off malloc
 
     close(fileDir);
 
