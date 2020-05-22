@@ -5,6 +5,7 @@ Server, take data from shared memory and writes to file.
 Open and post only at the beginning to acknowledge the client
 Open and post the new data semaphore to signify new data has come in
 
+Currently adds to the hexdump.
 */
 
 #include <iostream>
@@ -67,7 +68,7 @@ int main()
         return (1);
     }
 
-    if ((fileDir = shm_open(FILENAME, O_CREAT | O_RDWR, 0666)) == -1) // Open and create a file if it does not already exist
+    if ((fileDir = shm_open(FILENAME, O_CREAT | O_RDWR | O_APPEND, 0666)) == -1) // Open and create a file if it does not already exist
     {
         std::cout << "file opening error\n"
                   << errno;
@@ -79,6 +80,7 @@ int main()
         std::cout << "truncate fail\n";
         return (1);
     }
+
     
     if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
@@ -99,32 +101,26 @@ int main()
     while (true)
     {
 
+        strcpy(buffer, addr->input); // Copy contents of shared memory to buffer variable
 
+
+        sizeBuf = strlen(buffer);
+
+        if ((write(fileDir, buffer, sizeBuf)) == -1) // Offset of 0 - useful for watch hd <file>
+        {
+            std::cout << "write failure\n";
+            return (1);
+        }
+
+        memset(addr->input, 0, sizeof(char) * SIZE);
+
+
+// Put sem_wait at bottom, if client is run before server the output will be off
         if ((sem_wait(semNewData)) == -1) // Wait for signal, interruptable, blocks
         {
             std::cout << "sem wait new data failure\n";
             return (1);
         }
-
-
-
-        strcpy(buffer, addr->input); // Copy contents of shared memory to buffer variable
-
-        memset(addr->input, 0, sizeof(char) * SIZE);
-
-        write(fileDir, "hello\n", 5);
-
-
-        sizeBuf = strlen(buffer);
-        std::cout << buffer << "\t" << sizeBuf << std::endl; // Need endl, will only print until reaches new line
-
-
-
-        /*if ((pwrite(fileDir, buffer, sizeBuf, 0)) == -1) // Offset of 0 - useful for watch hd <file>
-        {
-            std::cout << "write failure\n";
-            return (1);
-        }*/
 
 
 
