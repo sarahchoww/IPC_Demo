@@ -68,18 +68,12 @@ int main()
     }
 
 
-    if ((fileDir = shm_open(FILENAME, O_CREAT | O_RDWR, 0666)) == -1) // Read, write by owner, group
+    if ((fileDir = shm_open(FILENAME, O_CREAT | O_RDWR | O_APPEND, 0666)) == -1) // Read, write by owner, group
     {
         std::cout << "file opening error";
         exit(1);
     } // Open and create a file if it does not already exist
 
-    if ((ftruncate(fileDir, sizeof(struct memory_data))) == -1)
-    {
-        std::cout << "truncate fail\n";
-        return (1);
-    }
-//ftruncate needed?
 
     if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
@@ -91,16 +85,6 @@ int main()
 
     while (run)
     {
-
-// Why wait on this?
-        if ((sem_wait(semPtr)) == -1) // Interruptable, blocks file semaphore
-        {
-            std::cout << "sem wait failed\n";
-            return (1);
-        }
-
-
-
         fgets(buffer, sizeof(buffer), stdin);
 
         sizeBuf = strlen(buffer);
@@ -113,9 +97,11 @@ int main()
         else // Keep loop going
         {
 
-            if (buffer[sizeBuf - 1] == '\n')
+            // If there are multiple clients
+            if((sem_wait(semPtr)) == -1)
             {
-                buffer[sizeBuf - 1] = '\0'; // Rid of newline
+                std::cout << "sem wait failure client\n";
+                return(1);
             }
 
             // Reset the time
