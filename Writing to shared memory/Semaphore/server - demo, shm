@@ -1,0 +1,156 @@
+/*
+Sarah Chow
+Server, take data from shared memory and writes to file.
+
+*/
+
+#include <iostream>
+#include <pthread.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <ctime>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <semaphore.h>
+
+#include <errno.h>
+
+#define SEM_NAME "/semTest" // Same name to share semaphores
+#define SEM_NEWDATA "/signal-new-data"
+#define FILENAME "/testSHM"
+#define ARR_SIZE 6
+
+// Need to add a safe if input exceeds size
+
+struct memory_data
+{
+    int id;
+    int arr[ARR_SIZE];
+};
+
+std::ostream &operator<<(std::ostream &os, struct tm const *ltime)
+{
+    return os << ltime->tm_sec;
+} // Override insertion operator
+
+void display(memory_data *dispAddr)
+{
+    for (int q = 0; q < (ARR_SIZE * 2); q++)
+    {
+        if (q < (ARR_SIZE))
+        {
+            std::cout << dispAddr->arr[q];
+        }
+        else if (q == ARR_SIZE)
+        {
+            std::cout << "\tIn hex: ";
+        }
+
+        if (q >= (ARR_SIZE))
+        {
+            std::cout << "0x" << std::hex << dispAddr->arr[q - ARR_SIZE] << " ";
+        }
+        
+    }
+}
+
+int main()
+{
+    int fileDir;
+
+    size_t sizeTime, sizeBuf;
+    //const char *fileName = "/testSHM"; // Pointing to where /testSHM is in memory
+
+    time_t my_time;
+    char *outputTime = nullptr;
+    struct tm *ltime; // Local time
+
+    struct memory_data *addr;
+    // Set size of addr
+
+    sem_t *semPtr, *semNewData;
+
+    if ((semPtr = sem_open(SEM_NAME, O_CREAT, 0700, 0)) == SEM_FAILED) // Access the semaphore
+    {
+        std::cout << "sem open failed\n";
+        return (1);
+    }
+
+    if ((semNewData = sem_open(SEM_NEWDATA, O_CREAT, 0700, 0)) == SEM_FAILED)
+    {
+        std::cout << "sem new data failed\n";
+        return (1);
+    }
+
+    if ((fileDir = shm_open(FILENAME, O_CREAT | O_RDWR | O_APPEND, 0666)) == -1) // Open and create a file if it does not already exist
+    {
+        std::cout << "file opening error\n"
+                  << errno;
+        exit(1);
+    }
+
+    if ((ftruncate(fileDir, sizeof(struct memory_data))) == -1)
+    {
+        std::cout << "truncate fail\n";
+        return (1);
+    }
+
+    if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+    {
+        std::cout << "mmap failed\n";
+        return (1);
+    }
+
+    if ((sem_post(semPtr)) == -1) // Unblocks sem for client to acknowledge
+    {
+        std::cout << "sem post failed\n";
+        return (1);
+    }
+
+    while (true)
+    {
+
+        if ((sem_wait(semNewData)) == -1) // Wait for signal, interruptable, blocks
+        {
+            std::cout << "sem wait new data failure\n";
+            return (1);
+        }
+
+        // Reset the time
+        time(&my_time);              // Current time put into my_time
+        ltime = localtime(&my_time); // Return the 'struct tm' representation of timer in local time zone
+
+        outputTime = asctime(ltime); // Takes in a pointer, converts to string
+
+
+        std::cout << outputTime;
+
+        std::cout << "Received ID: " << std::dec << addr->id
+                  << "\t\t\tIn hex: 0x" << std::hex << addr->id << std::endl;
+
+        std::cout << "Received data: ";
+
+        display(addr);
+
+        std::cout << "\n\n";
+    }
+
+    if (munmap(addr, sizeof(struct memory_data)) == -1)
+    {
+        std::cout << "munmap failed\n";
+        return (1);
+    }
+
+    close(fileDir);
+
+    shm_unlink("/testSHM");
+
+    sem_unlink(SEM_NAME);
+    sem_unlink(SEM_NEWDATA);
+
+    //have safes for each of the terminations
+
+    return (0);
+}
