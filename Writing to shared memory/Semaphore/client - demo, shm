@@ -1,0 +1,183 @@
+/*
+Sarah Chow
+Client, send data to shared memory
+
+
+*/
+
+#include <iostream>
+#include <pthread.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <ctime>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <semaphore.h>
+#include <stdlib.h>
+
+
+#include <errno.h>
+
+#define SEM_NAME "/semTest"            // Same name to share semaphores
+#define SEM_NEWDATA "/signal-new-data" // Semaphore to signal to writer there is new data
+#define FILENAME "/testSHM"
+#define ARR_SIZE 6
+
+// Need to add a safe if input exceeds size
+
+struct memory_data
+{
+    int id;
+    int arr[ARR_SIZE];
+};
+
+std::ostream &operator<<(std::ostream &os, struct tm const *ltime)
+{
+    return os << ltime->tm_sec;
+} // Override insertion operator
+
+
+void display(memory_data *dispAddr)
+{
+    for (int q = 0; q < (ARR_SIZE * 2); q++)
+    {
+        if (q < (ARR_SIZE))
+        {
+            std::cout << dispAddr->arr[q];
+        }
+        else if (q == ARR_SIZE)
+        {
+            std::cout << "\tIn hex: ";
+        }
+
+        if (q >= (ARR_SIZE))
+        {
+            std::cout << "0x" << std::hex << dispAddr->arr[q - ARR_SIZE] << " ";
+        }
+        
+    }
+}
+
+
+
+int main()
+{
+    int fileDir, randId, randData;
+    bool run = true;
+
+    size_t sizeTime, sizeBuf;
+    //const char *fileName = "/testSHM"; // Pointing to where /testSHM is in memory
+
+    time_t my_time;
+    char *outputTime = nullptr;
+    struct tm *ltime; // Local time
+
+    struct memory_data *addr;
+
+    sem_t *semPtr, *semNewData;
+
+    if ((semPtr = sem_open(SEM_NAME, O_CREAT, 0700, 0)) == SEM_FAILED) // Access semaphore
+    {
+        std::cout << "sem open failed\n";
+        std::cout << errno << std::endl;
+        return (1);
+    }
+
+    if ((semNewData = sem_open(SEM_NEWDATA, O_CREAT, 0700, 0)) == SEM_FAILED)
+    {
+        std::cout << "sem new data failed\n";
+        return (1);
+    }
+
+    if ((fileDir = shm_open(FILENAME, O_CREAT | O_RDWR | O_APPEND, 0666)) == -1) // Read, write by owner, group
+    {
+        std::cout << "file opening error";
+        exit(1);
+    } // Open and create a file if it does not already exist
+
+    if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+    {
+        std::cout << "mmap failed\n"
+                  << std::endl;
+        return (1);
+    }
+
+    for (int i = 0; i < 5; i++)
+    {
+
+
+        // If there are multiple clients
+        if ((sem_wait(semPtr)) == -1)
+        {
+            std::cout << "sem wait failure client\n";
+            return (1);
+        }
+
+        // Reset the time
+        time(&my_time);              // Current time put into my_time
+        ltime = localtime(&my_time); // Return the 'struct tm' representation of timer in local time zone
+
+        outputTime = asctime(ltime); // Takes in a pointer, converts to string
+
+        randId = rand() % 255;
+        // Random number between 0 and 255
+
+
+        addr->id = randId;
+
+        for (int p = 0; p < ARR_SIZE; p++)
+        {
+            randData = rand() % 255;
+            addr->arr[p] = randData;
+        }
+
+
+        if ((sem_post(semNewData)) == -1) // Signal new information, unblock
+        {
+            std::cout << "sem post new data failure loop\n";
+            return (1);
+        }
+
+        if ((sem_post(semPtr)) == -1) // Unblock semaphore
+        {
+            std::cout << "sem post failure loop\n";
+            return (1);
+        }
+
+        std::cout << outputTime;
+
+        std::cout << "Sending ID: " << std::dec << addr->id 
+            << "\t\t\tIn hex: 0x" << std::hex << addr->id << std::endl; 
+        
+        std::cout << "Sending data: ";
+        
+        display(addr);
+        
+        std::cout << "\n\n";
+
+        sleep(5);
+
+        //std::string test;
+        //std::cin >> test;
+
+
+    }
+
+
+    if (munmap(addr, sizeof(struct memory_data)) == -1)
+    {
+        std::cout << "munmap failed\n";
+        return (1);
+    }
+
+    close(fileDir);
+
+    shm_unlink("/testSHM");
+
+    sem_unlink(SEM_NAME);
+    sem_unlink(SEM_NEWDATA);
+
+    return (0);
+}
