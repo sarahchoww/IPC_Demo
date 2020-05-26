@@ -45,7 +45,7 @@ void display(memory_data *dispAddr)
     {
         if (q < (ARR_SIZE))
         {
-            std::cout << dispAddr->arr[q];
+            std::cout << "[" << std::dec << dispAddr->arr[q] << "]";
         }
         else if (q == ARR_SIZE)
         {
