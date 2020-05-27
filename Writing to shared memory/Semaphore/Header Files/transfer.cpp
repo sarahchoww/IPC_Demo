@@ -38,8 +38,6 @@ void Transfer::cleanUp()
         std::cout << "munmap failed\n";
     }
 
-    std::cout << "hello there unlinking\n";
-
     close(fileDir);
 
     sem_unlink(SEM_NEWDATA);
