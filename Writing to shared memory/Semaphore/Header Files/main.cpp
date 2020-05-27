@@ -8,12 +8,12 @@
 #include <iostream>
 #include <string>
 
-
-
 int main(int argc, char *argv[])
 {
 
-    Transfer *process;
+    Transfer *process = nullptr;
+    std::clock_t start;
+    double duration;
 
     if (argc == 2)
     {
@@ -23,39 +23,60 @@ int main(int argc, char *argv[])
         if (inputType == "sender")
         {
             process = new Sender();
+
+            for(int i = 0; i < 5; i++)
+            {
+
+                duration = 0;
+                start = std::clock();
+
+                if (process->run() == 1)
+                {
+                    std::cout << "run failed\n";
+                    return (1);
+                }
+
+                while (duration < 2)
+                {
+                    duration = (std::clock() - start) / (double) CLOCKS_PER_SEC;
+                    // CLOCKS_PER_SEC is number of clock ticks per second (1 000 000 ticks per second)
+                    // Take current clock minus clock from start divided by ticks per second
+                }
+
+            }
         }
         else if (inputType == "receiver")
         {
             process = new Receiver();
+
+            while(true)
+            {
+                if (process->run() == 1)
+                {
+                    std::cout << "run failed\n";
+                    return (1);
+                }
+            }
         }
         else
         {
             std::cout << "Invalid entry\n";
             return (1);
         }
-    }
 
-    if (process->setUp() == 1)
-    {
-        std::cout << "Setup failed\n"; 
-    }
-    else
-    {
-        for(int i = 0; i < 1; i++)
+        /*while(true)
         {
             if (process->run() == 1)
             {
-                std::cout << "Run failed\n"
-                        << std::endl;
+                std::cout << "run failed\n";
+                return (1);
             }
-        }
+            std::string test;
+            std::cin >> test;
+        }*/
+
+        delete process; // Destructor
     }
-
-
-
-    process->cleanUp();
-
-
 
     return (0);
 }
