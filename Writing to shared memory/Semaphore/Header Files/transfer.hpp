@@ -3,14 +3,14 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <string>
+#include <cstring>
 #include <ctime>
 #include <sys/types.h>
 #include <semaphore.h>
 
 #include <errno.h>
 
-#define SEM_NAME "/semTest" // Same name to share semaphores
+
 #define SEM_NEWDATA "/signal-new-data"
 #define FILENAME "/testSHM"
 #define ARR_SIZE 6
@@ -44,6 +44,7 @@ protected:
 
 public:
 
+    virtual ~Transfer() = default;
     virtual int setUp() = 0;
     virtual int run() = 0;
     void cleanUp();
