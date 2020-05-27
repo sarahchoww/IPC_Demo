@@ -2,17 +2,15 @@
 #include "transfer.hpp"
 
 
-
-
 void Transfer::display()
 {
 
     std::cout << outputTime;
 
-    std::cout << "Sending ID: " << std::dec << addr->id
+    std::cout << "ID: " << std::dec << addr->id
               << "\t\t\t\t\tIn hex: 0x" << std::hex << addr->id << std::endl;
 
-    std::cout << "Sending data: ";
+    std::cout << "Data: ";
 
     for (int q = 0; q < (ARR_SIZE * 2); q++)
     {
@@ -30,6 +28,7 @@ void Transfer::display()
             std::cout << "0x" << std::hex << addr->arr[q - ARR_SIZE] << " ";
         }
     }
+
 }
 
 void Transfer::cleanUp()
@@ -39,11 +38,10 @@ void Transfer::cleanUp()
         std::cout << "munmap failed\n";
     }
 
+    std::cout << "hello there unlinking\n";
+
     close(fileDir);
 
-    shm_unlink("/testSHM");
-
-    sem_unlink(SEM_NAME);
     sem_unlink(SEM_NEWDATA);
     
 }
