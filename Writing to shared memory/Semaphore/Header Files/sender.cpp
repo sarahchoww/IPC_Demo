@@ -1,8 +1,8 @@
 #include "sender.hpp"
 
-
 Sender::Sender()
 {
+    Transfer::setUp();
     setUp();
 }
 
@@ -13,47 +13,24 @@ Sender::~Sender()
 
 // Setup the sender
 int Sender::setUp()
-{    
-    if ((semNewData = sem_open(SEM_NEWDATA, O_CREAT, 0600, 0)) == SEM_FAILED)
-    {
-        std::cout << "sem new data failed\n";
-        return (1);
-    }
-
-
-    if ((fileDir = shm_open(FILENAME, O_CREAT | O_RDWR, 0600)) == -1) // Open and create a file if it does not already exist
-    {
-        std::cout << "file opening error\n"
-                  << errno;
-        return(1);
-    }
-
-    if ((ftruncate(fileDir, sizeof(struct memory_data))) == -1)
-    {
-        std::cout << "truncate fail\n";
-        return (1);
-    }
-
+{
     if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
-        std::cout << "mmap failed\n"
-                  << errno << std::endl;
+        std::cout << "mmap failed\n";
         return (1);
     }
 
     return (0);
 }
 
-
 int Sender::run()
-{    
+{
     // Reset the time
-    time(&my_time);                    // Current time put into my_time
+    time(&my_time);              // Current time put into my_time
     ltime = localtime(&my_time); // Return the 'struct tm' representation of timer in local time zone
     outputTime = asctime(ltime); // Takes in a pointer, converts to string
 
     genData();
-
 
     if ((sem_post(semNewData)) == -1) // Signal new information, unblock
     {
@@ -63,11 +40,18 @@ int Sender::run()
 
     std::cout << "Sending\n";
     display();
-    std::cout << "\n\n";
+    std::cout << "\n";
 
-    return(0);
+    std::cout << "Waiting for data to be received\n\n";
+
+    if ((sem_wait(semReceived)) == -1) // Wait for signal data was received
+    {
+        std::cout << "sem wait received failed\n";
+        return (1);
+    }
+
+    return (0);
 }
-
 
 void Sender::genData()
 {
@@ -83,6 +67,4 @@ void Sender::genData()
         randData = rand() % 255;
         addr->arr[p] = randData;
     }
-
-
 }
