@@ -1,18 +1,19 @@
 // Interface for sender and receiver
 #include <iostream>
-#include <sys/mman.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <cstring>
-#include <ctime>
-#include <sys/types.h>
-#include <semaphore.h>
-
-#include <errno.h>
-
+#include <sys/mman.h> // mmap flags
+#include <fcntl.h> // flags
+#include <unistd.h> // ftruncate
+#include <ctime> // localtime and asctime
+#include <sys/types.h> // time_t
+#include <semaphore.h> // sem
+#include <signal.h> // For ctrl-c
+#include <string.h>
+#include <stdio.h>
 
 #define SEM_NEWDATA "/signal-new-data"
+#define SEM_RECEIVED "/wait-received"
 #define FILENAME "/testSHM"
+#define FILEPATH "/dev/shm/sem."
 #define ARR_SIZE 6
 
 #pragma once
@@ -28,24 +29,20 @@ protected:
 
     int fileDir;
 
-    size_t sizeTime, sizeBuf;
-    //const char *fileName = "/testSHM"; // Pointing to where /testSHM is in memory
-
     time_t my_time;
     char *outputTime = nullptr;
     struct tm *ltime; // Local time
 
     struct memory_data *addr;
-    // Set size of addr
 
-    sem_t *semPtr, *semNewData;
+    sem_t *semNewData, *semReceived;
 
  
 
 public:
 
     virtual ~Transfer() = default;
-    virtual int setUp() = 0;
+    int setUp();
     virtual int run() = 0;
     void cleanUp();
     void display();
