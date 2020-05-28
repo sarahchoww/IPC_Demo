@@ -31,6 +31,36 @@ void Transfer::display()
 
 }
 
+int Transfer::setUp()
+{   
+    if ((semNewData = sem_open(SEM_NEWDATA, O_CREAT, 0600, 0)) == SEM_FAILED)
+    {
+        std::cout << "sem new data failed\n";
+        return(1);
+    }
+
+    if ((semReceived = sem_open(SEM_RECEIVED, O_CREAT, 0600, 0)) == SEM_FAILED)
+    {
+        std::cout << "sem new data failed\n";
+        return(1);
+    }
+
+    if ((fileDir = shm_open(FILENAME, O_CREAT | O_RDWR, 0600)) == -1) // Open and create a file if it does not already exist
+    {
+        std::cout << "file opening error\n";
+        return(1);
+    }
+
+
+    if ((ftruncate(fileDir, sizeof(struct memory_data))) == -1)
+    {
+        std::cout << "truncate fail\n";
+        return(1);
+    }
+
+    return(0);
+}
+
 void Transfer::cleanUp()
 {
     if (munmap(addr, sizeof(struct memory_data)) == -1)
@@ -38,8 +68,4 @@ void Transfer::cleanUp()
         std::cout << "munmap failed\n";
     }
 
-    close(fileDir);
-
-    sem_unlink(SEM_NEWDATA);
-    
 }
