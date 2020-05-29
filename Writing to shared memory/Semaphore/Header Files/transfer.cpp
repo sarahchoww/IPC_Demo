@@ -61,11 +61,63 @@ int Transfer::setUp()
     return(0);
 }
 
-void Transfer::cleanUp()
+void Transfer::cleanUpMap()
 {
     if (munmap(addr, sizeof(struct memory_data)) == -1)
     {
         std::cout << "munmap failed\n";
     }
 
+}
+
+void Transfer::cleanUpFiles()
+{
+    shm_unlink(FILENAME);
+
+    sem_close(semNewData);
+    sem_close(semReceived);
+
+    remove("/dev/shm/sem.signal-new-data");
+    remove("/dev/shm/sem.wait-received");
+
+    /*std::string tempRandom = SEM_NEWDATA;
+    char deleteFile1[tempRandom.length()] = SEM_NEWDATA;
+    char *newCopy1 = nullptr;
+
+    memcpy(newCopy1, deleteFile1 + 1, strlen(deleteFile1)); // rid of the slash at start of name
+
+    std::string temp = FILEPATH;
+
+    char rm1[temp.length() + strlen(newCopy1)] = FILEPATH; // variable for file path to shared memory, size of both strings
+
+    strcat(rm1, newCopy1); // concatenate file path and file name into "rm"
+
+    std::cout << "\n"
+              << rm1 << std::endl;
+
+    if (remove(rm1) != 0)
+    {
+        std::cout << "remove error\n"
+                  << errno;
+    }
+
+    tempRandom = SEM_RECEIVED;
+    char deleteFile[tempRandom.length()] = SEM_RECEIVED;
+    char *newCopy = nullptr;
+
+    memcpy(newCopy, deleteFile + 1, strlen(deleteFile)); // rid of the slash at start of name
+
+    char rm[temp.length() + strlen(newCopy)] = FILEPATH; // variable for file path to shared memory, size of both strings
+
+    strcat(rm, newCopy); // concatenate file path and file name into "rm"
+
+    std::cout << "\n"
+              << rm << std::endl;
+
+    if (remove(rm) != 0)
+    {
+        std::cout << "remove error\n"
+                  << errno;
+
+    */
 }
