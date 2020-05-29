@@ -1,5 +1,4 @@
-
-// --------------------------------------
+// Sender and receiver program
 
 #include "sender.hpp"
 #include "receiver.hpp"
@@ -10,7 +9,6 @@
 
 int main(int argc, char *argv[])
 {
-
     Transfer *process = nullptr;
 
     if (argc == 2)
@@ -32,6 +30,12 @@ int main(int argc, char *argv[])
             return (1);
         }
     }
+    else
+    {
+        std::cout << "Invalid argument(s)\n";
+        return(1);
+    }
+    
 
     if (process->run() == 1)
     {
