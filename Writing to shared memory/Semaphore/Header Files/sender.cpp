@@ -8,7 +8,7 @@ Sender::Sender()
 
 Sender::~Sender()
 {
-    Transfer::cleanUp();
+    Transfer::cleanUpMap();
 }
 
 // Setup the sender
@@ -25,29 +25,71 @@ int Sender::setUp()
 
 int Sender::run()
 {
-    // Reset the time
-    time(&my_time);              // Current time put into my_time
-    ltime = localtime(&my_time); // Return the 'struct tm' representation of timer in local time zone
-    outputTime = asctime(ltime); // Takes in a pointer, converts to string
+    bool run = true;
+    int i = 0;
 
-    genData();
+    std::clock_t start;
+    double duration;
 
-    if ((sem_post(semNewData)) == -1) // Signal new information, unblock
+    struct timespec timer;
+
+    while (i < 5 && run == true)
     {
-        std::cout << "sem post new data failure loop\n";
-        return (1);
-    }
+        duration = 0;
+        start = std::clock();
 
-    std::cout << "Sending\n";
-    display();
-    std::cout << "\n";
+        // Reset the time
+        time(&my_time);              // Current time put into my_time
+        ltime = localtime(&my_time); // Return the 'struct tm' representation of timer in local time zone
+        outputTime = asctime(ltime); // Takes in a pointer, converts to string
 
-    std::cout << "Waiting for data to be received\n\n";
+        genData();
 
-    if ((sem_wait(semReceived)) == -1) // Wait for signal data was received
-    {
-        std::cout << "sem wait received failed\n";
-        return (1);
+        if ((sem_post(semNewData)) == -1) // Signal new information, unblock
+        {
+            std::cout << "sem post new data failure loop\n";
+            return (1);
+        }
+
+        std::cout << "Sending\n";
+        display();
+        std::cout << "\n";
+
+        std::cout << "Waiting for data to be received\n\n";
+
+        if (clock_gettime(CLOCK_REALTIME, &timer) == -1) // Get current time and store in timer
+        {
+            perror("clock_gettime");
+            exit(EXIT_FAILURE);
+        }
+
+        timer.tv_sec += 10; // Add 10 seconds to timer, when to time out
+
+        if ((sem_timedwait(semReceived, &timer)) == -1) // Wait for signal data was received
+        {
+            if (errno == ETIMEDOUT) // Timed out
+            {
+                run = false;
+                std::cout << "Timed out\n";
+                cleanUpFiles(); // Delete files in shared memory
+            }
+            else // Error
+            {
+                std::cout << "sem wait received failed\n";
+                return (1);
+            }
+        }
+        else
+        {
+            while (duration < 2) // Wait 2 seconds
+            {
+                duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+                // CLOCKS_PER_SEC is number of clock ticks per second (1 000 000 ticks per second)
+                // Take current clock minus clock from start divided by ticks per second
+            }
+
+            i++;
+        }
     }
 
     return (0);
