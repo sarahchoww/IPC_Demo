@@ -45,7 +45,7 @@ public:
     int setUp();
     virtual int run() = 0;
     void cleanUpMap();
-    void cleanUpFiles();
+    void cleanUpFiles ();
+    void deleteSemFiles(char deleteFile[]);
     void display();
-
 };
