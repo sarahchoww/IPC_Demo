@@ -7,8 +7,6 @@ public:
     Receiver();
     ~Receiver();
     int setUp();
-    void cleanUp();
-
     int run();
 
 };
