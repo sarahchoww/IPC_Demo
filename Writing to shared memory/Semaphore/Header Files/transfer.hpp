@@ -44,7 +44,8 @@ public:
     virtual ~Transfer() = default;
     int setUp();
     virtual int run() = 0;
-    void cleanUp();
+    void cleanUpMap();
+    void cleanUpFiles();
     void display();
 
 };
