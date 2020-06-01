@@ -10,6 +10,13 @@ bin/obj:
 	echo here
 	mkdir -p $@
 
+run_du:
+	cd bin; ./sim receiver
+
+
+run_ru:
+	cd bin; ./sim sender
+
 clean:
 	rm -rf bin
 
