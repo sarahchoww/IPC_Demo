@@ -1,4 +1,4 @@
-#include "sender.hpp"
+#include <packet/sender.hpp>
 
 Sender::Sender()
 {

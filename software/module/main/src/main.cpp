@@ -1,8 +1,8 @@
 // Sender and receiver program
 
-#include "sender.hpp"
-#include "receiver.hpp"
-#include "transfer.hpp"
+#include <packet/sender.hpp>
+#include <packet/receiver.hpp>
+#include <packet/transfer.hpp>
 
 #include <iostream>
 #include <string>

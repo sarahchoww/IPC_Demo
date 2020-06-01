@@ -1,4 +1,4 @@
-#include "receiver.hpp"
+#include <packet/receiver.hpp>
 
 Receiver::Receiver()
 {

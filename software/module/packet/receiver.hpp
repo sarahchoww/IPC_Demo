@@ -1,4 +1,4 @@
-#include "transfer.hpp"
+#include <packet/transfer.hpp>
 
 class Receiver : public Transfer
 {
