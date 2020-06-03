@@ -4,7 +4,7 @@ CFLAGS=-Wall
 all: bin/obj bin/sim
 
 bin/sim: bin/obj/main.o bin/obj/transfer.o bin/obj/sender.o bin/obj/receiver.o
-	$(CC) -o $@ $^ $(CFLAGS) -lrt -pthread
+	$(CC) -o $@ $^ $(CFLAGS) -lrt -pthread -lconfig++
 
 bin/obj:
 	echo here
