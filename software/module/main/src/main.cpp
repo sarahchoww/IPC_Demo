@@ -6,6 +6,65 @@
 
 #include <iostream>
 #include <string>
+#include <libconfig.h++>
+
+
+
+void senderConfig()
+{
+    libconfig::Config cfg;
+
+    try
+    {
+        cfg.readFile("configSender.cfg");
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+
+    // Name
+    try
+    {
+        std::string name = cfg.lookup("name");
+        std::cout << name << std::endl;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
+    
+    
+}
+
+void receiverConfig()
+{
+    libconfig::Config cfg;
+
+    try
+    {
+        cfg.readFile("configReceiver.cfg");
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
+    // Name
+    try
+    {
+        std::string name = cfg.lookup("name");
+        std::cout << name << std::endl;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    
+
+}
+
 
 int main(int argc, char *argv[])
 {
