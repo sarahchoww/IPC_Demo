@@ -5,39 +5,39 @@
 
 #include <iostream>
 #include <libconfig.h++>
+#include <cstring>
 
-int Config::inputType(Transfer *process)
+int Config::type(Transfer **process, char *argv[])
 {
-     // Convert argv[1] to a string by copying it
-        std::string inputType(argv[1]);
+    // Convert argv[1] to a string by copying it
+    std::string inputType1(argv[1]);
 
-        if (inputType == "sender")
-        {
-            configRU();
-            process = new Sender();
-        }
-        else if (inputType == "receiver")
-        {
-            configDU();
-            process = new Receiver();
-        }
-        else
-        {
-            std::cout << "Invalid entry\n";
-            return (1);
-        }
-        return(0);
+    if (inputType1 == "sender")
+    {
+        configRU();
+        *process = new Sender(); // Change the address of process
+    }
+    else if (inputType1 == "receiver")
+    {
+        configDU();
+        *process = new Receiver();
+    }
+    else
+    {
+        std::cout << "Invalid entry\n";
+        return (1);
+    }
+    return (0);
 }
-
 
 void Config::configRU()
 {
     libconfig::Config cfg;
-    cfg.setIncludeDir("software/module");
+    cfg.setIncludeDir("software/bin");
 
     try
     {
-        cfg.readFile("relocateRU.cfg");
+        cfg.readFile("config/configRU.cfg");
     }
     catch (const std::exception &e)
     {
@@ -56,23 +56,19 @@ void Config::configRU()
     }
 }
 
-
-
-
 void Config::configDU()
 {
     libconfig::Config cfg;
-    //cfg.setIncludeDir("software/module");
+    cfg.setIncludeDir("software/bin");
 
     try
     {
-        cfg.readFile("relocateDU.cfg");
+        cfg.readFile("config/configDU.cfg");
     }
     catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
     }
-
 
     // Name
     try
@@ -80,9 +76,8 @@ void Config::configDU()
         std::string name = cfg.lookup("name");
         std::cout << name << std::endl;
     }
-    catch(const std::exception& e)
+    catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
     }
-
 }

@@ -3,7 +3,7 @@ CFLAGS=-Wall
 
 all: bin/obj bin/sim
 
-bin/sim: bin/obj/main.o bin/obj/transfer.o bin/obj/sender.o bin/obj/receiver.o
+bin/sim: bin/obj/main.o bin/obj/config.o bin/obj/transfer.o bin/obj/sender.o bin/obj/receiver.o
 	$(CC) -o $@ $^ $(CFLAGS) -lrt -pthread -lconfig++
 
 bin/obj:
@@ -19,10 +19,14 @@ run_ru:
 
 clean:
 	rm -rf bin/obj
-	rm sim
+	cd bin; rm sim
 
 # Main
 bin/obj/main.o: module/main/src/main.cpp module/packet/transfer.hpp module/packet/sender.hpp module/packet/receiver.hpp
+	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
+
+#Config
+bin/obj/config.o: module/config/config.cpp module/config/config.hpp module/packet/transfer.hpp module/packet/sender.hpp module/packet/receiver.hpp
 	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
 
 # Packet
