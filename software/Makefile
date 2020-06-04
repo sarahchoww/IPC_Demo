@@ -10,15 +10,16 @@ bin/obj:
 	echo here
 	mkdir -p $@
 
-run_du:
+run_du: 
 	cd bin; ./sim receiver
 
 
-run_ru:
+run_ru: 
 	cd bin; ./sim sender
 
 clean:
-	rm -rf bin
+	rm -rf bin/obj
+	rm sim
 
 # Main
 bin/obj/main.o: module/main/src/main.cpp module/packet/transfer.hpp module/packet/sender.hpp module/packet/receiver.hpp
