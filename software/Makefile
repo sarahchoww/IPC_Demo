@@ -11,22 +11,22 @@ bin/obj:
 	mkdir -p $@
 
 run_du: 
-	cd bin; ./sim receiver
+	@cd bin; ./sim receiver
 
 
 run_ru: 
-	cd bin; ./sim sender
+	@cd bin; ./sim sender
 
 clean:
 	rm -rf bin/obj
 	cd bin; rm sim
 
 # Main
-bin/obj/main.o: module/main/src/main.cpp module/packet/transfer.hpp module/packet/sender.hpp module/packet/receiver.hpp
+bin/obj/main.o: module/main/src/main.cpp module/packet/transfer.hpp
 	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
 
 #Config
-bin/obj/config.o: module/config/config.cpp module/config/config.hpp module/packet/transfer.hpp module/packet/sender.hpp module/packet/receiver.hpp
+bin/obj/config.o: module/config/src/config.cpp module/config/config.hpp module/packet/transfer.hpp module/packet/sender.hpp module/packet/receiver.hpp
 	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
 
 # Packet

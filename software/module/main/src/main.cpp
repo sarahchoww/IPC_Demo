@@ -1,7 +1,5 @@
 // Sender and receiver program
 
-#include <packet/sender.hpp>
-#include <packet/receiver.hpp>
 #include <packet/transfer.hpp>
 #include <config/config.hpp>
 
