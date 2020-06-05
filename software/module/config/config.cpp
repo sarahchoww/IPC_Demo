@@ -48,7 +48,7 @@ void Config::configRU()
     try
     {
         std::string name = cfg.lookup("name");
-        std::cout << name << std::endl;
+        std::cout << "From config file: " << name << std::endl;
     }
     catch (const std::exception &e)
     {
@@ -74,7 +74,7 @@ void Config::configDU()
     try
     {
         std::string name = cfg.lookup("name");
-        std::cout << name << std::endl;
+        std::cout << "From config file: " << name << std::endl;
     }
     catch (const std::exception &e)
     {
