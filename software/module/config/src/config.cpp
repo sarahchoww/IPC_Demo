@@ -33,7 +33,7 @@ int Config::type(Transfer **process, char *argv[])
 void Config::configRU()
 {
     libconfig::Config cfg;
-    cfg.setIncludeDir("software/bin");
+    cfg.setIncludeDir("software/bin/config");
 
     try
     {
