@@ -1,4 +1,3 @@
-
 #include <packet/transfer.hpp>
 
 
@@ -33,19 +32,52 @@ void Transfer::display()
 
 int Transfer::setUp()
 {   
-    if ((semNewData = sem_open(SEM_NEWDATA, O_CREAT, 0600, 0)) == SEM_FAILED)
+
+
+    std::fstream fileStream;
+    
+    // Check if semNewData file exists
+
+    fileStream.open(semNewDataFile);
+
+    if (fileStream.fail())
+    {       
+        std::cout << "Error, file already exists\n";
+        return(1);
+    }
+    else if ((semNewData = sem_open(semNewDataFile, O_CREAT, 0600, 0)) == SEM_FAILED)
     {
         std::cout << "sem new data failed\n";
         return(1);
     }
 
-    if ((semReceived = sem_open(SEM_RECEIVED, O_CREAT, 0600, 0)) == SEM_FAILED)
+
+    // Check if semReceived file exists
+
+    fileStream.open(semReceivedFile);
+
+    if (fileStream.fail())
+    {       
+        std::cout << "Error, file already exists\n";
+        return(1);
+    }
+    else if ((semReceived = sem_open(semReceivedFile, O_CREAT, 0600, 0)) == SEM_FAILED)
     {
         std::cout << "sem new data failed\n";
         return(1);
     }
 
-    if ((fileDir = shm_open(FILENAME, O_CREAT | O_RDWR, 0600)) == -1) // Open and create a file if it does not already exist
+
+
+    // Check if shared file already exists
+    fileStream.open(fileID);
+
+    if (fileStream.fail())
+    {       
+        std::cout << "Error, file already exists\n";
+        return(1);
+    }
+    else if ((fileDir = shm_open(fileID, O_CREAT | O_RDWR, 0600)) == -1) // Open and create a file if it does not already exist
     {
         std::cout << "file opening error\n";
         return(1);
@@ -74,9 +106,9 @@ void Transfer::cleanUpMap()
 void Transfer::deleteSemFiles (char deleteFile[])
 {
 
-    std::string temp = FILEPATH;
+    std::string temp = fileID;
 
-    char rm[temp.length() + strlen(deleteFile)] = FILEPATH; // variable for file path to shared memory, size of both strings
+    char rm[temp.length() + strlen(deleteFile)] = fileID; // variable for file path to shared memory, size of both strings
 
     strcat(rm, deleteFile); // concatenate file path and file name into "rm"
 
@@ -91,7 +123,7 @@ void Transfer::deleteSemFiles (char deleteFile[])
 
 void Transfer::cleanUpFiles()
 {
-    shm_unlink(FILENAME);
+    shm_unlink(fileID);
 
     sem_close(semNewData);
     sem_close(semReceived);
@@ -102,11 +134,11 @@ void Transfer::cleanUpFiles()
 
         if (i == 1)
         {
-            deleteFileName = SEM_NEWDATA;
+            deleteFileName = semNewDataFile;
         }
         else
         {
-            deleteFileName = SEM_RECEIVED;
+            deleteFileName = semReceivedFile;
 
         }
         

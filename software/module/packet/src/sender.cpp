@@ -35,6 +35,9 @@ int Sender::run()
 
     while (i < 5 && run == true)
     {
+        std::cout << "sender id \t" << getpid() << std::endl;
+
+
         duration = 0;
         start = std::clock();
 

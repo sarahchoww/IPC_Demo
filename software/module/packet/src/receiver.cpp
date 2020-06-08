@@ -24,11 +24,15 @@ int Receiver::setUp()
 
 int Receiver::run()
 {
+
+
     bool run = true;
     struct timespec timer;
 
     while (run)
     {
+            std::cout << "receiver id \t" << getpid() << std::endl;
+
         if (clock_gettime(CLOCK_REALTIME, &timer) == -1) // Get current time and store in timer
         {
             perror("clock_gettime");

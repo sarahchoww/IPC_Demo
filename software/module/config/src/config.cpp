@@ -1,3 +1,4 @@
+
 #include <config/config.hpp>
 #include <packet/receiver.hpp>
 #include <packet/sender.hpp>
@@ -11,10 +12,12 @@ int Config::type(Transfer **process, char *argv[])
 {
     // Convert argv[1] to a string by copying it
     std::string inputType1(argv[1]);
+    std::string semNewDataFile, semReceivedFile, fileId;
+
 
     if (inputType1 == "sender")
     {
-        configRU();
+        semNewDataFile, semReceivedFile, fileId = configRU();
         *process = new Sender(); // Change the address of process
     }
     else if (inputType1 == "receiver")
@@ -30,8 +33,11 @@ int Config::type(Transfer **process, char *argv[])
     return (0);
 }
 
-void Config::configRU()
+std::string Config::configRU()
 {
+    int RUid;
+    std::string semNewDataFile, semReceivedFile, fileId;
+
     libconfig::Config cfg;
     cfg.setIncludeDir("software/bin/config");
 
@@ -54,6 +60,15 @@ void Config::configRU()
     {
         std::cerr << e.what() << '\n';
     }
+
+    RUid = getpid();
+
+    semNewDataFile = SEM_NEWDATA + std::to_string(RUid);
+    semReceivedFile = SEM_RECEIVED + std::to_string(RUid);
+    fileId = FILENAME + std::to_string(RUid);
+
+    return semNewDataFile, semReceivedFile, fileId;
+
 }
 
 void Config::configDU()

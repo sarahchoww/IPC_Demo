@@ -1,3 +1,4 @@
+#pragma once
 #include <packet/transfer.hpp>
 
 class Config
@@ -24,10 +25,11 @@ protected:
 
 
     public : 
-        int type(Transfer **process, char *argv[]);
+
+    int type(Transfer **process, char *argv[]);
     // Double pointer, single pointer makes a copy of the data, double is the address
     // Sending in a pointer of a pointer
 
-    void configRU();
+    std::string configRU();
     void configDU();
 };

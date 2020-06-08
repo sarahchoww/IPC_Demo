@@ -1,3 +1,5 @@
+#pragma once
+
 // Interface for sender and receiver
 #include <iostream>
 #include <sys/mman.h> // mmap flags
@@ -9,14 +11,15 @@
 #include <signal.h> // For ctrl-c
 #include <string.h>
 #include <stdio.h>
+#include <fstream> // Check if file exists in system / try to open the file
+
+#include <config/config.hpp>
 
 #define SEM_NEWDATA "/signal-new-data"
 #define SEM_RECEIVED "/wait-received"
 #define FILENAME "/testSHM"
 #define FILEPATH "/dev/shm/sem."
 #define ARR_SIZE 6
-
-#pragma once
 
 class Transfer
 {
@@ -36,6 +39,8 @@ protected:
     struct memory_data *addr;
 
     sem_t *semNewData, *semReceived;
+
+    
 
  
 
