@@ -30,8 +30,9 @@ void Transfer::display()
 
 const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operation)
 {
-    // Rearrange for the deletion, omit the slash
-    // Otherwise, copies filename / transforms into char pointer to be sent to operateFiles()
+    // Rearrange / append characters and put into const char *
+    // Operation 1 : create file
+    // Operation 2 : delete file
 
     int numOffset = 0; // Offset when setting up to delete, need to rid of first slash
 
