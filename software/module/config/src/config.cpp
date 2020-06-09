@@ -1,29 +1,34 @@
-
 #include <config/config.hpp>
-#include <packet/receiver.hpp>
-#include <packet/sender.hpp>
-#include <packet/transfer.hpp>
+
 
 #include <iostream>
 #include <libconfig.h++>
 #include <cstring>
 
-int Config::type(Transfer **process, char *argv[])
+int Config::type(Transfer *&process, char *argv[]) // Change reference to a pointer
 {
     // Convert argv[1] to a string by copying it
     std::string inputType1(argv[1]);
-    std::string semNewDataFile, semReceivedFile, fileId;
+    bool idFail;
+
+    // Get ID
+    if ((idFail = configID()) == true)
+    {
+        std::cout << "ID error\n";
+        return(1);
+    }
 
 
     if (inputType1 == "sender")
     {
-        semNewDataFile, semReceivedFile, fileId = configRU();
-        *process = new Sender(); // Change the address of process
+        configRU();
+        process = new Sender(id); // Change the address of process
+
     }
     else if (inputType1 == "receiver")
     {
         configDU();
-        *process = new Receiver();
+        process = new Receiver(id);
     }
     else
     {
@@ -33,10 +38,8 @@ int Config::type(Transfer **process, char *argv[])
     return (0);
 }
 
-std::string Config::configRU()
+void Config::configRU()
 {
-    int RUid;
-    std::string semNewDataFile, semReceivedFile, fileId;
 
     libconfig::Config cfg;
     cfg.setIncludeDir("software/bin/config");
@@ -54,20 +57,12 @@ std::string Config::configRU()
     try
     {
         std::string name = cfg.lookup("name");
-        std::cout << "From config file: " << name << std::endl;
+        std::cout << "From config file NAME: " << name << std::endl;
     }
     catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
     }
-
-    RUid = getpid();
-
-    semNewDataFile = SEM_NEWDATA + std::to_string(RUid);
-    semReceivedFile = SEM_RECEIVED + std::to_string(RUid);
-    fileId = FILENAME + std::to_string(RUid);
-
-    return semNewDataFile, semReceivedFile, fileId;
 
 }
 
@@ -89,10 +84,41 @@ void Config::configDU()
     try
     {
         std::string name = cfg.lookup("name");
-        std::cout << "From config file: " << name << std::endl;
+        std::cout << "From config file NAME: " << name << std::endl;
     }
     catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
     }
+}
+
+// Add a part to change ID if user enters a specific argv?
+bool Config::configID()
+{
+    libconfig::Config cfg;
+    cfg.setIncludeDir("software/bin");
+
+    try
+    {
+        cfg.readFile("config/configID.cfg");
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+        return true;
+    }
+
+    // Name
+    try
+    {
+        id = cfg.lookup("id");
+        std::cout << "From config file ID: " << id << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+        return true;
+    }
+
+    return false;
 }

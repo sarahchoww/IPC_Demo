@@ -8,15 +8,17 @@
 #include <libconfig.h++>
 
 
-
 int main(int argc, char *argv[])
 {
     Transfer *process = nullptr;
-    Config *setUpProcess = nullptr;
+    Config setUpProcess;
 
     if (argc == 2)
     {
-       setUpProcess->type(&process, argv); // Send the value of process / 'nullptr' (?)
+       if ((setUpProcess.type(process, argv)) == 1) // Send process
+       {
+           return(1);
+       }
     }
     else
     {

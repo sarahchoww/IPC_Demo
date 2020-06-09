@@ -1,5 +1,7 @@
 #pragma once
 #include <packet/transfer.hpp>
+#include <packet/receiver.hpp>
+#include <packet/sender.hpp>
 
 class Config
 {
@@ -24,12 +26,13 @@ protected:
 
 
 
-    public : 
-
-    int type(Transfer **process, char *argv[]);
+public : 
+    int id;
+    int type(Transfer *&process, char *argv[]);
     // Double pointer, single pointer makes a copy of the data, double is the address
     // Sending in a pointer of a pointer
 
-    std::string configRU();
+    void configRU();
     void configDU();
+    bool configID();
 };

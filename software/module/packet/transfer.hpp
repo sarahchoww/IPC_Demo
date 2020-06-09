@@ -9,11 +9,10 @@
 #include <sys/types.h> // time_t
 #include <semaphore.h> // sem
 #include <signal.h> // For ctrl-c
-#include <string.h>
+#include <cstring>
 #include <stdio.h>
 #include <fstream> // Check if file exists in system / try to open the file
 
-#include <config/config.hpp>
 
 #define SEM_NEWDATA "/signal-new-data"
 #define SEM_RECEIVED "/wait-received"
@@ -40,17 +39,22 @@ protected:
 
     sem_t *semNewData, *semReceived;
 
-    
+    const char * semNewDataFile;
+    const char * semReceivedFile;
+    const char * fileID;
+
 
  
 
 public:
 
     virtual ~Transfer() = default;
-    int setUp();
+    int setUp(int id);
+
     virtual int run() = 0;
     void cleanUpMap();
-    void cleanUpFiles ();
-    void deleteSemFiles(char deleteFile[]);
+    void cleanUpFiles();
+    const char * arrangeFiles(std::string fileToArrange, int id, int operation);
+
     void display();
 };

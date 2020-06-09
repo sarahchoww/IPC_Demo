@@ -1,9 +1,11 @@
 #include <packet/sender.hpp>
 
-Sender::Sender()
+Sender::Sender(int id)
 {
-    Transfer::setUp();
-    setUp();
+
+    Transfer::setUp(id);
+    setUp(id);
+
 }
 
 Sender::~Sender()
@@ -12,13 +14,16 @@ Sender::~Sender()
 }
 
 // Setup the sender
-int Sender::setUp()
+int Sender::setUp(int id)
 {
     if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
         return (1);
     }
+
+    // Set id in struct
+    addr->id = id;
 
     return (0);
 }
@@ -35,9 +40,6 @@ int Sender::run()
 
     while (i < 5 && run == true)
     {
-        std::cout << "sender id \t" << getpid() << std::endl;
-
-
         duration = 0;
         start = std::clock();
 
@@ -100,12 +102,7 @@ int Sender::run()
 
 void Sender::genData()
 {
-    int randId, randData;
-
-    randId = rand() % 255;
-    // Random number between 0 and 255
-
-    addr->id = randId;
+    int randData;
 
     for (int p = 0; p < ARR_SIZE; p++)
     {
