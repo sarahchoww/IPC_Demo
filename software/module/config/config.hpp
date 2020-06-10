@@ -1,4 +1,7 @@
+#pragma once
 #include <packet/transfer.hpp>
+#include <packet/receiver.hpp>
+#include <packet/sender.hpp>
 
 class Config
 {
@@ -15,6 +18,9 @@ protected:
 
     // reserved variable
 
+//BOOL???
+    int dataDirection, rb, symInc, ef, sfStatus, lbtDrsRes, initialPartialSF, lbtBufErr, lbtCWR_Rst;
+
     unsigned int payloadVersion, filterIndex, frameId, subframeId, slotId, startSymbolid, numberOfsections, sectionType, numberOfUEs, timeOffset, cpLength, sectionId, startPrbc, reMask, numPrbc, numSymbol, beamId, ueId, regularizationFactor, laaMsgType, laaMsgLen,
     lbtHandle, lbtDeferFactor, lbtBackoffCounter, lbtOffset, MCOT, lbtMode, lbtPdschRes, sfnSf, lbtCWConfig_H, lbtCWConfig_T,
     lbtTrafficClass;
@@ -23,11 +29,13 @@ protected:
 
 
 
-    public : 
-        int type(Transfer **process, char *argv[]);
+public : 
+    int id;
+    int type(Transfer *&process, char *argv[]);
     // Double pointer, single pointer makes a copy of the data, double is the address
     // Sending in a pointer of a pointer
 
     void configRU();
     void configDU();
+    bool configID();
 };

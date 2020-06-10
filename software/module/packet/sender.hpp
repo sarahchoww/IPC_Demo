@@ -3,8 +3,8 @@
 class Sender : public Transfer
 {
 public:
-    int setUp();
-    Sender();
+    int setUp(int id);
+    Sender(int id);
     ~Sender();
     int run();
     void genData();

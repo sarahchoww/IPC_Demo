@@ -1,9 +1,9 @@
 #include <packet/receiver.hpp>
 
-Receiver::Receiver()
+Receiver::Receiver(int id)
 {
-    Transfer::setUp();
-    setUp();
+    Transfer::setUp(id);
+    setUp(id);
 }
 
 Receiver::~Receiver()
@@ -11,8 +11,9 @@ Receiver::~Receiver()
     Transfer::cleanUpMap();
 }
 
-int Receiver::setUp()
+int Receiver::setUp(int id)
 {
+
     if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
