@@ -64,6 +64,16 @@ void Config::configRU()
         std::cerr << e.what() << '\n';
     }
 
+    try
+    {
+        dataDirection = cfg.lookup("dataDirection");
+        std::cout << "From config file DATADIRECTION: " << dataDirection << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+
 }
 
 void Config::configDU()
@@ -85,6 +95,17 @@ void Config::configDU()
     {
         std::string name = cfg.lookup("name");
         std::cout << "From config file NAME: " << name << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+
+    // dataDirection
+    try
+    {
+        dataDirection = cfg.lookup("dataDirection");
+        std::cout << "From config file DATADIRECTION: " << dataDirection << std::endl;
     }
     catch (const std::exception &e)
     {

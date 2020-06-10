@@ -18,6 +18,9 @@ protected:
 
     // reserved variable
 
+//BOOL???
+    int dataDirection, rb, symInc, ef, sfStatus, lbtDrsRes, initialPartialSF, lbtBufErr, lbtCWR_Rst;
+
     unsigned int payloadVersion, filterIndex, frameId, subframeId, slotId, startSymbolid, numberOfsections, sectionType, numberOfUEs, timeOffset, cpLength, sectionId, startPrbc, reMask, numPrbc, numSymbol, beamId, ueId, regularizationFactor, laaMsgType, laaMsgLen,
     lbtHandle, lbtDeferFactor, lbtBackoffCounter, lbtOffset, MCOT, lbtMode, lbtPdschRes, sfnSf, lbtCWConfig_H, lbtCWConfig_T,
     lbtTrafficClass;

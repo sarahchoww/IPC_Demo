@@ -37,17 +37,13 @@ const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operat
     int numOffset = 0; // Offset when setting up to delete, need to rid of first slash
 
     char *fileName = new char[fileToArrange.length()];
-    const char *result;
 
     if (operation == 2)
     {
         numOffset = 1;
     }
 
-    std::copy(fileToArrange.begin() + numOffset, fileToArrange.end(), fileName); // Copy string to a char, omit the slash
-
-//std::cout << "from function, fileToArrange\t\t" << fileToArrange << std::endl;
-//std::cout << "from func, fileName:\t\t" << fileName << std::endl;
+    std::copy(fileToArrange.begin() + numOffset, fileToArrange.end(), fileName); // Copy string to a char*, omit the slash
 
     if (operation == 1)
     {
@@ -69,16 +65,17 @@ const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operat
             std::cout << "remove error\n";
         }
     }
+    return NULL;
 }
 
 
 int Transfer::setUp(int id)
 {
 
+    semNewDataFile = arrangeFiles(SEM_NEWDATA, id, 1);
     semReceivedFile = arrangeFiles(SEM_RECEIVED, id, 1);
     fileID = arrangeFiles(FILENAME, id, 1);
 
-    semNewDataFile = arrangeFiles(SEM_NEWDATA, id, 1);
 
     if ((semNewData = sem_open(semNewDataFile, O_CREAT, 0600, 0)) == SEM_FAILED)
     {
