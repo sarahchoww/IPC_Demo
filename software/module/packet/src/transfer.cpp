@@ -1,5 +1,5 @@
 #include <packet/transfer.hpp>
-
+/*
 void Transfer::display()
 {
 
@@ -27,6 +27,7 @@ void Transfer::display()
         }
     }
 }
+*/
 
 const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operation)
 {
@@ -69,12 +70,11 @@ const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operat
 }
 
 
-int Transfer::setUp(int id)
+int Transfer::setUp(int idValue)
 {
-
-    semNewDataFile = arrangeFiles(SEM_NEWDATA, id, 1);
-    semReceivedFile = arrangeFiles(SEM_RECEIVED, id, 1);
-    fileID = arrangeFiles(FILENAME, id, 1);
+    semNewDataFile = arrangeFiles(SEM_NEWDATA, idValue, 1);
+    semReceivedFile = arrangeFiles(SEM_RECEIVED, idValue, 1);
+    fileID = arrangeFiles(FILENAME, idValue, 1);
 
 
     if ((semNewData = sem_open(semNewDataFile, O_CREAT, 0600, 0)) == SEM_FAILED)
@@ -112,7 +112,7 @@ void Transfer::cleanUpMap()
     }
 }
 
-void Transfer::cleanUpFiles()
+void Transfer::cleanUpFiles(memory_data *&addr)
 {
     shm_unlink(fileID);
 

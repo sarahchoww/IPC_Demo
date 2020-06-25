@@ -3,9 +3,9 @@
 class Sender : public Transfer
 {
 public:
-    int setUp(int id);
-    Sender(int id);
+    Sender(int idValue);
     ~Sender();
+    int setUp(int idValue);
     int run();
-    void genData();
+    void genData(memory_data *&addr);
 };

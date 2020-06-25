@@ -4,9 +4,9 @@ class Receiver : public Transfer
 {
 
 public:
-    Receiver(int id);
+    Receiver(int idValue);
     ~Receiver();
-    int setUp(int id);
+    int setUp(int idValue);
     int run();
 
 };

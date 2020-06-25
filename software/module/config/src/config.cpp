@@ -1,16 +1,16 @@
 #include <config/config.hpp>
 
-
 #include <iostream>
 #include <libconfig.h++>
 #include <cstring>
 
 int Config::type(Transfer *&process, char *argv[]) // Change reference to a pointer
 {
+
     // Convert argv[1] to a string by copying it
     std::string inputType1(argv[1]);
     bool idFail;
-
+    
     // Get ID
     if ((idFail = configID()) == true)
     {
@@ -19,22 +19,26 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
     }
 
 
+    configDU();
+
     if (inputType1 == "sender")
     {
-        configRU();
-        process = new Sender(id); // Change the address of process
+        setData();
+        process = new Sender(idValue);
 
     }
     else if (inputType1 == "receiver")
     {
-        configDU();
-        process = new Receiver(id);
+        process = new Receiver(idValue);
+
     }
     else
     {
         std::cout << "Invalid entry\n";
         return (1);
     }
+
+
     return (0);
 }
 
@@ -66,8 +70,8 @@ void Config::configRU()
 
     try
     {
-        dataDirection = cfg.lookup("dataDirection");
-        std::cout << "From config file DATADIRECTION: " << dataDirection << std::endl;
+        iterator.dataDirection = cfg.lookup("dataDirection");
+        std::cout << "From config file DATADIRECTION: " << iterator.dataDirection << std::endl;
     }
     catch (const std::exception &e)
     {
@@ -78,6 +82,7 @@ void Config::configRU()
 
 void Config::configDU()
 {
+
     libconfig::Config cfg;
     cfg.setIncludeDir("software/bin");
 
@@ -104,13 +109,25 @@ void Config::configDU()
     // dataDirection
     try
     {
-        dataDirection = cfg.lookup("dataDirection");
-        std::cout << "From config file DATADIRECTION: " << dataDirection << std::endl;
+        iterator.dataDirection = cfg.lookup("dataDirection");
+        std::cout << "From config file DATADIRECTION: " << iterator.dataDirection << std::endl;
     }
     catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
     }
+
+    // payloadVersion
+    try
+    {
+        iterator.payloadVersion = cfg.lookup("payloadVersion");
+        std::cout << "From config file PAYLOADVERSION: " << iterator.payloadVersion << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+
 }
 
 // Add a part to change ID if user enters a specific argv?
@@ -132,14 +149,18 @@ bool Config::configID()
     // Name
     try
     {
-        id = cfg.lookup("id");
-        std::cout << "From config file ID: " << id << std::endl;
+        idValue = cfg.lookup("id");
+                std::cout << "hello there\n";
+
+        std::cout << "From config file ID: " << idValue << std::endl;
     }
     catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
         return true;
     }
+        std::cout << "hello\n";
+
 
     return false;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <config/struct.hpp>
 
 // Interface for sender and receiver
 #include <iostream>
@@ -23,11 +24,8 @@
 class Transfer
 {
 protected:
-   struct memory_data
-    {
-        int id;
-        int arr[ARR_SIZE];
-    };
+
+
 
     int fileDir;
 
@@ -35,7 +33,6 @@ protected:
     char *outputTime = nullptr;
     struct tm *ltime; // Local time
 
-    struct memory_data *addr;
 
     sem_t *semNewData, *semReceived;
 
@@ -48,13 +45,25 @@ protected:
 
 public:
 
+/*    struct memory_data
+    {
+        int id;
+        int dataDirection, rb, symInc, ef, reserved;
+        unsigned int payloadVersion, filterIndex, frameId, subframeId, slotId, startSymbolid, numberOfsections, udCompHdr, sectionType, sectionId, startPrbc, reMask, numPrbc, numSymbol, beamId;
+
+    };
+*/
+
+    memory_data *addr;
+
+
     virtual ~Transfer() = default;
-    int setUp(int id);
+    int setUp(int idValue);
 
     virtual int run() = 0;
     void cleanUpMap();
-    void cleanUpFiles();
+    void cleanUpFiles(memory_data *&addr);
     const char * arrangeFiles(std::string fileToArrange, int id, int operation);
 
-    void display();
+    //void display();
 };

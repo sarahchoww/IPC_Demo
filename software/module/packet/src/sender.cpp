@@ -1,10 +1,10 @@
 #include <packet/sender.hpp>
 
-Sender::Sender(int id)
+Sender::Sender(int idValue)
 {
 
-    Transfer::setUp(id);
-    setUp(id);
+    Transfer::setUp(idValue);
+    setUp(idValue);
 
 }
 
@@ -14,16 +14,16 @@ Sender::~Sender()
 }
 
 // Setup the sender
-int Sender::setUp(int id)
+int Sender::setUp(int idValue)
 {
+
     if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
         return (1);
     }
+    addr->id = idValue;
 
-    // Set id in struct
-    addr->id = id;
 
     return (0);
 }
@@ -48,7 +48,7 @@ int Sender::run()
         ltime = localtime(&my_time); // Return the 'struct tm' representation of timer in local time zone
         outputTime = asctime(ltime); // Takes in a pointer, converts to string
 
-        genData();
+        genData(addr);
 
         if ((sem_post(semNewData)) == -1) // Signal new information, unblock
         {
@@ -57,7 +57,7 @@ int Sender::run()
         }
 
         std::cout << "Sending\n";
-        display();
+        //display();
         std::cout << "\n";
 
         std::cout << "Waiting for data to be received\n\n";
@@ -76,7 +76,7 @@ int Sender::run()
             {
                 run = false;
                 std::cout << "Timed out\n";
-                cleanUpFiles(); // Delete files in shared memory
+                cleanUpFiles(addr); // Delete files in shared memory
             }
             else // Error
             {
@@ -100,13 +100,9 @@ int Sender::run()
     return (0);
 }
 
-void Sender::genData()
+void Sender::genData(memory_data *&addr)
 {
-    int randData;
+    int randNum = 4;
 
-    for (int p = 0; p < ARR_SIZE; p++)
-    {
-        randData = rand() % 255;
-        addr->arr[p] = randData;
-    }
+    addr->ef = randNum;
 }

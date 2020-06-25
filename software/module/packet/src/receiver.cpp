@@ -1,9 +1,9 @@
 #include <packet/receiver.hpp>
 
-Receiver::Receiver(int id)
+Receiver::Receiver(int idValue)
 {
-    Transfer::setUp(id);
-    setUp(id);
+    Transfer::setUp(idValue);
+    setUp(idValue);
 }
 
 Receiver::~Receiver()
@@ -11,7 +11,7 @@ Receiver::~Receiver()
     Transfer::cleanUpMap();
 }
 
-int Receiver::setUp(int id)
+int Receiver::setUp(int idValue)
 {
 
     if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
@@ -19,6 +19,7 @@ int Receiver::setUp(int id)
         std::cout << "mmap failed\n";
         return (1);
     }
+
 
     return (0);
 }
@@ -46,7 +47,7 @@ int Receiver::run()
             {
                 run = false;
                 std::cout << "Timed out\n";
-                cleanUpFiles(); // Delete files in shared memory
+                cleanUpFiles(addr); // Delete files in shared memory
             }
             else // Error
             {
@@ -65,7 +66,7 @@ int Receiver::run()
 
             std::cout << "Receiving\n";
 
-            display();
+            //display();
 
             std::cout << "\n\n";
 
