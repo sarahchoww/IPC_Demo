@@ -1,30 +1,29 @@
-#include <packet/receiver.hpp>
-#include <packet/sender.hpp>
+#include <config/config.hpp>
 #include <config/struct.hpp>
 
-class DU
+class DU : public Config
 {
 protected:
-    int bandSectorId;
-    int CCid;
-    int DUPortId;
-    std::string RATtype; // LTE or NR
-    double numerology; // 15 kHz for LTE
-    std::string divisionDuplex; // FDD or TDD
-    double bandwidth; // 1.4, 3, 5, 10, 15, 20 MHz
-    std::string prefixType; // Normal or extended
+
+/*
+    enum LTE
+    {
+        numOfFrames = 256, // Follow up
+        numOfSubframes = 10,
+        numOfSlots = 2,
+        numOfSyms = 7, // Standard for 7 symbols, can't change *************8
+        numPrbc = 15   // num of PRB, change?
+    };
+
+*/
 
     int numOfFrames;
     int numOfSubframes;
     int numOfSlots;
     int numOfSyms;
 
-    memory_data iterator;
-
-
 public:
-    void setData();
-    void iterateData();
-    void rotateGrid();
-
+    DU(configVars &cVar, memory_data &iterator);
+    ~DU(){};
+    int rotateGrid(memory_data &iterator, Transfer *&process) override;
 };

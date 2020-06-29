@@ -1,35 +1,52 @@
 #include <config/config.hpp>
 
 #include <iostream>
-#include <libconfig.h++>
 #include <cstring>
+
+class DU;
+
+#include <config/du.hpp>
 
 int Config::type(Transfer *&process, char *argv[]) // Change reference to a pointer
 {
-
     // Convert argv[1] to a string by copying it
     std::string inputType1(argv[1]);
     bool idFail;
-    
+    configVars cVar;
+    memory_data iterator;
+
+
+
     // Get ID
     if ((idFail = configID()) == true)
     {
         std::cout << "ID error\n";
-        return(1);
+        return (1);
     }
 
 
-    configDU();
-
     if (inputType1 == "sender")
     {
-        setData();
-        process = new Sender(idValue);
+        process = new Sender(idValue, sendBit);
+        if (configDU(cVar) == 1)
+        {
+            std::cout << "configDU failed\n";
+            return(1);
+        }
+
+        Config *useDU = new DU(cVar, iterator);
+        useDU->rotateGrid(iterator, process);
 
     }
     else if (inputType1 == "receiver")
     {
-        process = new Receiver(idValue);
+        process = new Receiver(idValue, sendBit);
+        
+        if (process->run(sendBit) == 1)
+        {
+            std::cout << "run failed\n";
+            return (1);
+        }
 
     }
     else
@@ -38,51 +55,11 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
         return (1);
     }
 
-
     return (0);
 }
 
-void Config::configRU()
+int Config::configDU(configVars &cVar)
 {
-
-    libconfig::Config cfg;
-    cfg.setIncludeDir("software/bin/config");
-
-    try
-    {
-        cfg.readFile("config/configRU.cfg");
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-
-    // Name
-    try
-    {
-        std::string name = cfg.lookup("name");
-        std::cout << "From config file NAME: " << name << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-
-    try
-    {
-        iterator.dataDirection = cfg.lookup("dataDirection");
-        std::cout << "From config file DATADIRECTION: " << iterator.dataDirection << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-
-}
-
-void Config::configDU()
-{
-
     libconfig::Config cfg;
     cfg.setIncludeDir("software/bin");
 
@@ -92,45 +69,26 @@ void Config::configDU()
     }
     catch (const std::exception &e)
     {
-        std::cerr << e.what() << '\n';
+        std::cerr << e.what() << "\t readFile\n";
+        return (1);
     }
 
-    // Name
-    try
-    {
-        std::string name = cfg.lookup("name");
-        std::cout << "From config file NAME: " << name << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << '\n';
-    }
+    sendBit->dataDirection = accessFileInt(cfg, "dataDirection");
+    sendBit->payloadVersion = accessFileUnSignedInt(cfg, "payloadVersion");
 
-    // dataDirection
-    try
-    {
-        iterator.dataDirection = cfg.lookup("dataDirection");
-        std::cout << "From config file DATADIRECTION: " << iterator.dataDirection << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << '\n';
-    }
+    cVar.bandSectorId = accessFileInt(cfg, "bandSectorId");
+    cVar.CCid = accessFileInt(cfg, "CCid");
+    cVar.DUPortId = accessFileInt(cfg, "DUPortId");
+    cVar.RATtype = accessFileStr(cfg, "RATtype");
+    cVar.numerology = accessFileInt(cfg, "numerology");
+    cVar.divisionDuplex = accessFileStr(cfg, "divisionDuplex");
+    cVar.bandwidth = accessFileInt(cfg, "bandwidth");
+    cVar.prefixType = accessFileStr(cfg, "prefixType");
 
-    // payloadVersion
-    try
-    {
-        iterator.payloadVersion = cfg.lookup("payloadVersion");
-        std::cout << "From config file PAYLOADVERSION: " << iterator.payloadVersion << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << '\n';
-    }
 
+    return(0);
 }
 
-// Add a part to change ID if user enters a specific argv?
 bool Config::configID()
 {
     libconfig::Config cfg;
@@ -150,8 +108,6 @@ bool Config::configID()
     try
     {
         idValue = cfg.lookup("id");
-                std::cout << "hello there\n";
-
         std::cout << "From config file ID: " << idValue << std::endl;
     }
     catch (const std::exception &e)
@@ -159,8 +115,53 @@ bool Config::configID()
         std::cerr << e.what() << '\n';
         return true;
     }
-        std::cout << "hello\n";
-
 
     return false;
+}
+
+std::string Config::accessFileStr(libconfig::Config &cfg, std::string paramName)
+{
+    try
+    {
+        std::string passStr = cfg.lookup(paramName);
+        std::cout << "From config file " << paramName << ": " << passStr << std::endl;
+        return passStr;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << "\tlookUp\n";
+    }
+    return NULL;
+}
+
+unsigned int Config::accessFileUnSignedInt(libconfig::Config &cfg, std::string paramName)
+{
+    unsigned int num;
+    try
+    {
+        num = cfg.lookup(paramName);
+        std::cout << "From config file " << paramName << ": " << num << std::endl;
+        return num;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << "\tlookUp\n";
+    }
+    return num;
+}
+
+
+int Config::accessFileInt(libconfig::Config &cfg, std::string paramName)
+{
+    int num;
+    try
+    {
+        num = cfg.lookup(paramName);
+        std::cout << "From config file " << paramName << ": " << num << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << "\tlookUp\n";
+    }
+    return num;
 }

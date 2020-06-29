@@ -1,15 +1,18 @@
 #include <config/du.hpp>
 
-void DU::setData()
+// cVar is for config variables
+// iterator is for message variables
+
+DU::DU(configVars &cVar, memory_data &iterator)
 {
-    if (RATtype == "LTE") // LTE
+    if (cVar.RATtype == "LTE") // LTE
     {
         numOfFrames = 256; // Follow up
         numOfSubframes = 10;
         numOfSlots = 2;
-        
+
         // number of symbols
-        if (prefixType == "Normal") // Normal
+        if (cVar.prefixType == "Normal") // Normal
         {
             numOfSyms = 7;
         }
@@ -19,43 +22,50 @@ void DU::setData()
         }
 
         // number of PRBs
-        if (bandwidth == 1.4)
+        if (cVar.bandwidth == 5)
         {
-            
+            iterator.numPrbc = 25;
         }
-
-
     }
     else // NR
     {
-        NULL;
+        std::cout << "RATtype:\t" << cVar.RATtype << std::endl;
+        ;
     }
 }
 
-void DU::iterateData()
+int DU::rotateGrid(memory_data &iterator, Transfer *&process)
 {
-    rotateGrid();
+    int count = 0;
 
-    std::cout << "from struct\t" << iterator.payloadVersion << std::endl;
-}
-
-void DU::rotateGrid()
-{
-    std::cout << "entered func\n";
-    /*
-    for(iterator.frameId; iterator.frameId < numOfFrames; iterator.frameId++)
+    for (iterator.frameId = 0; (int)iterator.frameId < numOfFrames; iterator.frameId++)
     {
-        for(iterator.subframeId; iterator.subframeId < numOfSubframes; iterator.subframeId++)
+        sendBit->frameId = iterator.frameId;
+
+
+        for (iterator.subframeId = 0; (int)iterator.subframeId < numOfSubframes; iterator.subframeId++)
         {
-            for(iterator.slotId; iterator.slotId < numOfSlots; iterator.slotId++)
+            sendBit->subframeId = iterator.subframeId;
+
+            for (iterator.slotId = 0; (int)iterator.slotId < numOfSlots; iterator.slotId++)
             {
-                for(iterator.startSymbolid; iterator.startSymbolid < numOfSyms; iterator.startSymbolid++)
+                sendBit->slotId = iterator.slotId;
+                std::cout << "number\t" << iterator.slotId << std::endl;
+
+                // Send C-Plane message
+                if (process->run(sendBit) == 1)
                 {
-                    NULL;
+                    std::cout << "run failed\n";
+                    return (1);
+                }
+
+                for (iterator.startSymbolid = 0; (int)iterator.startSymbolid < numOfSyms; iterator.startSymbolid++)
+                {
+                    // Send U-Plane message;
+                    count++;
                 }
             }
         }
     }
-
-    */
+    return (0);
 }

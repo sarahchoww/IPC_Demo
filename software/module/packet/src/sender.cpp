@@ -1,35 +1,36 @@
 #include <packet/sender.hpp>
 
-Sender::Sender(int idValue)
+Sender::Sender(int idValue, bitPack_t *&sendBit)
 {
 
     Transfer::setUp(idValue);
-    setUp(idValue);
+    setUp(idValue, sendBit);
 
-}
-
-Sender::~Sender()
-{
-    Transfer::cleanUpMap();
 }
 
 // Setup the sender
-int Sender::setUp(int idValue)
+int Sender::setUp(int idValue, bitPack_t *&sendBit)
 {
 
-    if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+    if ((sendBit = (bitPack_t *)mmap(NULL, sizeof(bitPack_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
         return (1);
     }
-    addr->id = idValue;
+    sendBit->id = idValue;
 
 
     return (0);
 }
 
-int Sender::run()
+int Sender::run(bitPack_t *&sendBit)
 {
+    for (int i = 0; i < 5; i++)
+    {
+        sendBit->rb = i;
+    }
+
+
     bool run = true;
     int i = 0;
 
@@ -38,8 +39,8 @@ int Sender::run()
 
     struct timespec timer;
 
-    while (i < 5 && run == true)
-    {
+    //while (i < 5 && run == true)
+    //{
         duration = 0;
         start = std::clock();
 
@@ -48,8 +49,6 @@ int Sender::run()
         ltime = localtime(&my_time); // Return the 'struct tm' representation of timer in local time zone
         outputTime = asctime(ltime); // Takes in a pointer, converts to string
 
-        genData(addr);
-
         if ((sem_post(semNewData)) == -1) // Signal new information, unblock
         {
             std::cout << "sem post new data failure loop\n";
@@ -57,8 +56,7 @@ int Sender::run()
         }
 
         std::cout << "Sending\n";
-        //display();
-        std::cout << "\n";
+
 
         std::cout << "Waiting for data to be received\n\n";
 
@@ -76,7 +74,9 @@ int Sender::run()
             {
                 run = false;
                 std::cout << "Timed out\n";
-                cleanUpFiles(addr); // Delete files in shared memory
+                cleanUpFiles(sendBit); // Delete files in shared memory
+                cleanUpMap(sendBit);
+                return (1);
             }
             else // Error
             {
@@ -93,16 +93,9 @@ int Sender::run()
                 // Take current clock minus clock from start divided by ticks per second
             }
 
-            i++;
+            //i++;
         }
-    }
+    //}
 
     return (0);
-}
-
-void Sender::genData(memory_data *&addr)
-{
-    int randNum = 4;
-
-    addr->ef = randNum;
 }

@@ -1,18 +1,43 @@
 #pragma once
-
+#include <packet/receiver.hpp>
+#include <packet/sender.hpp>
 #include <config/struct.hpp>
-#include <config/du.hpp>
+#include <libconfig.h++>
 
-class Config : public DU
+class Config
 {
-public:    
+protected:
+    struct configVars
+    {
+        int bandSectorId;
+        int CCid;
+        int DUPortId;
+        std::string RATtype;        // LTE or NR
+        int numerology;          // 15 kHz for LTE
+        std::string divisionDuplex; // FDD or TDD
+        int bandwidth;           // 1.4, 3, 5, 10, 15, 20 MHz
+        std::string prefixType;     // Normal or extended
+
+    };
+
+    bitPack_t *sendBit;
+
+
+public:
     int idValue;
-    
+
     int type(Transfer *&process, char *argv[]);
     // Double pointer, single pointer makes a copy of the data, double is the address
     // Sending in a pointer of a pointer
 
-    void configRU();
-    void configDU();
     bool configID();
+    int configDU(configVars &cVar);
+
+    std::string accessFileStr(libconfig::Config &cfg, std::string paramName);
+    unsigned int accessFileUnSignedInt(libconfig::Config &cfg, std::string paramName);
+
+    int accessFileInt(libconfig::Config &cfg, std::string paramName);
+
+    virtual int rotateGrid(memory_data &iterator, Transfer *&process) {return 1;};
+
 };

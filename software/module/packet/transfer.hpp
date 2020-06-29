@@ -24,9 +24,6 @@
 class Transfer
 {
 protected:
-
-
-
     int fileDir;
 
     time_t my_time;
@@ -43,27 +40,12 @@ protected:
 
  
 
-public:
-
-/*    struct memory_data
-    {
-        int id;
-        int dataDirection, rb, symInc, ef, reserved;
-        unsigned int payloadVersion, filterIndex, frameId, subframeId, slotId, startSymbolid, numberOfsections, udCompHdr, sectionType, sectionId, startPrbc, reMask, numPrbc, numSymbol, beamId;
-
-    };
-*/
-
-    memory_data *addr;
-
-
+public: 
     virtual ~Transfer() = default;
     int setUp(int idValue);
 
-    virtual int run() = 0;
-    void cleanUpMap();
-    void cleanUpFiles(memory_data *&addr);
+    virtual int run(bitPack_t *&sendBit) = 0;
+    void cleanUpMap(bitPack_t *&sendBit);
+    void cleanUpFiles(bitPack_t *&sendBit);
     const char * arrangeFiles(std::string fileToArrange, int id, int operation);
-
-    //void display();
 };

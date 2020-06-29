@@ -26,12 +26,13 @@ int main(int argc, char *argv[])
         return (1);
     }
 
+/*
     if (process->run() == 1)
     {
         std::cout << "run failed\n";
         return (1);
     }
-
+*/
 
     delete process; // Destructor
     return (0);
