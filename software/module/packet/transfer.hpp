@@ -44,8 +44,10 @@ public:
     virtual ~Transfer() = default;
     int setUp(int idValue);
 
-    virtual int run(bitPack_t *&sendBit) = 0;
+    virtual int run(memory_data &iterator, bitPack_t *&sendBit) = 0;
     void cleanUpMap(bitPack_t *&sendBit);
-    void cleanUpFiles(bitPack_t *&sendBit);
+    void cleanUpFiles(memory_data &iterator);
     const char * arrangeFiles(std::string fileToArrange, int id, int operation);
+
+    void display(bitPack *&sendBit);
 };

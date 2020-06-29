@@ -3,8 +3,9 @@
 // cVar is for config variables
 // iterator is for message variables
 
-DU::DU(configVars &cVar, memory_data &iterator)
+DU::DU(configVars &cVar, memory_data &iterator, bitPack_t *&sendBit)
 {
+    sendBit->sectionType = 1;
     if (cVar.RATtype == "LTE") // LTE
     {
         numOfFrames = 256; // Follow up
@@ -36,6 +37,7 @@ DU::DU(configVars &cVar, memory_data &iterator)
 int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBit)
 {
     int count = 0;
+    int runResult;
 
     for (iterator.frameId = 0; (int)iterator.frameId < numOfFrames; iterator.frameId++)
     {
@@ -50,10 +52,15 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBi
                 sendBit->slotId = iterator.slotId;
 
                 // Send C-Plane message
-                if (process->run(sendBit) == 1)
+                runResult = process->run(iterator, sendBit);
+                if (runResult == 1) // Failed
                 {
                     std::cout << "run failed\n";
                     return (1);
+                }
+                else if (runResult == 2) // Timed out
+                {
+                    return(0);
                 }
 
                 for (iterator.startSymbolid = 0; (int)iterator.startSymbolid < numOfSyms; iterator.startSymbolid++)

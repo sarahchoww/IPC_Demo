@@ -19,7 +19,7 @@ int Receiver::setUp(int idValue, bitPack_t *&sendBit)
     return (0);
 }
 
-int Receiver::run(bitPack_t *&sendBit)
+int Receiver::run(memory_data &iterator, bitPack_t *&sendBit)
 {
     bool run = true;
     struct timespec timer;
@@ -43,7 +43,7 @@ int Receiver::run(bitPack_t *&sendBit)
             {
                 run = false;
                 std::cout << "Timed out\n";
-                cleanUpFiles(sendBit); // Delete files in shared memory
+                cleanUpFiles(iterator); // Delete files in shared memory
                 cleanUpMap(sendBit);
             }
             else // Error
@@ -62,6 +62,7 @@ int Receiver::run(bitPack_t *&sendBit)
             outputTime = asctime(ltime); // Takes in a pointer, converts to string
 
             std::cout << "Receiving\n";
+            display(sendBit);
 
             if ((sem_post(semReceived)) == -1) // Notify data has been received
             {

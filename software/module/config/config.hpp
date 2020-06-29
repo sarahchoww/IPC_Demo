@@ -30,7 +30,7 @@ public:
     // Double pointer, single pointer makes a copy of the data, double is the address
     // Sending in a pointer of a pointer
 
-    bool configID();
+    bool configID(memory_data &iterator);
     int configDU(configVars &cVar);
 
     std::string accessFileStr(libconfig::Config &cfg, std::string paramName);

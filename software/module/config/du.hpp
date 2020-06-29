@@ -23,7 +23,7 @@ protected:
     int numOfSyms;
 
 public:
-    DU(configVars &cVar, memory_data &iterator);
+    DU(configVars &cVar, memory_data &iterator, bitPack_t *&sendBit);
     ~DU(){};
     int rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBit);
 };

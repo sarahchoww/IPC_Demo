@@ -1,4 +1,5 @@
 #include <packet/transfer.hpp>
+#include <vector>
 
 const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operation)
 {
@@ -43,8 +44,8 @@ const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operat
 
 int Transfer::setUp(int idValue)
 {
-    semNewDataFile = arrangeFiles(SEM_NEWDATA, idValue, 1);
     semReceivedFile = arrangeFiles(SEM_RECEIVED, idValue, 1);
+    semNewDataFile = arrangeFiles(SEM_NEWDATA, idValue, 1);
     fileID = arrangeFiles(FILENAME, idValue, 1);
 
 
@@ -84,13 +85,23 @@ void Transfer::cleanUpMap(bitPack_t *&sendBit)
     }
 }
 
-void Transfer::cleanUpFiles(bitPack_t *&sendBit)
+void Transfer::cleanUpFiles(memory_data &iterator)
 {
     shm_unlink(fileID);
 
     sem_close(semNewData);
     sem_close(semReceived);
 
-    arrangeFiles(semNewDataFile, (sendBit->id), 2);
-    arrangeFiles(semReceivedFile, (sendBit->id), 2);
+    arrangeFiles(semNewDataFile, (iterator.id), 2);
+    arrangeFiles(semReceivedFile, (iterator.id), 2);
+}
+
+
+void Transfer::display(bitPack *&sendBit)
+{
+    std::cout << "DATADIRECTION: " << sendBit->dataDirection;
+    std::cout << "\nPAYLOADVER: " << sendBit->payloadVersion;
+    std::cout << "\nFRAMEID: " << sendBit->frameId;
+    std::cout << "\nSUBFRAMEID: " << sendBit->subframeId;
+    std::cout << "\nSLOTID: " << sendBit->slotId << "\n\n";
 }

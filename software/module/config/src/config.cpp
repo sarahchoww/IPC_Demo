@@ -18,7 +18,7 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
 
 
     // Get ID
-    if ((idFail = configID()) == true)
+    if ((idFail = configID(iterator)) == true)
     {
         std::cout << "ID error\n";
         return (1);
@@ -34,7 +34,7 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
             return(1);
         }
 
-        Config *useDU = new DU(cVar, iterator);
+        Config *useDU = new DU(cVar, iterator, sendBit);
         useDU->rotateGrid(iterator, process, sendBit);
 
     }
@@ -42,7 +42,7 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
     {
         process = new Receiver(idValue, sendBit);
         
-        if (process->run(sendBit) == 1)
+        if (process->run(iterator, sendBit) == 1)
         {
             std::cout << "run failed\n";
             return (1);
@@ -90,7 +90,7 @@ int Config::configDU(configVars &cVar)
     return(0);
 }
 
-bool Config::configID()
+bool Config::configID(memory_data &iterator)
 {
     libconfig::Config cfg;
     cfg.setIncludeDir("software/bin");
@@ -110,6 +110,7 @@ bool Config::configID()
     {
         idValue = cfg.lookup("id");
         std::cout << "From config file ID: " << idValue << std::endl;
+        iterator.id = idValue;
     }
     catch (const std::exception &e)
     {
