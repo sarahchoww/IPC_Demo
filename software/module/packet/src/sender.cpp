@@ -67,7 +67,7 @@ int Sender::run(bitPack_t *&sendBit)
         }
 
         timer.tv_sec += 10; // Add 10 seconds to timer, when to time out
-
+/*
         if ((sem_timedwait(semReceived, &timer)) == -1) // Wait for signal data was received
         {
             if (errno == ETIMEDOUT) // Timed out
@@ -85,7 +85,7 @@ int Sender::run(bitPack_t *&sendBit)
             }
         }
         else
-        {
+        {*/
             while (duration < 2) // Wait 2 seconds
             {
                 duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
@@ -94,7 +94,7 @@ int Sender::run(bitPack_t *&sendBit)
             }
 
             //i++;
-        }
+        //}
     //}
 
     return (0);

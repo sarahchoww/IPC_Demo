@@ -38,6 +38,6 @@ public:
 
     int accessFileInt(libconfig::Config &cfg, std::string paramName);
 
-    virtual int rotateGrid(memory_data &iterator, Transfer *&process) {return 1;};
+    virtual int rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBit) {return 1;};
 
 };

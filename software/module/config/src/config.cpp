@@ -35,7 +35,7 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
         }
 
         Config *useDU = new DU(cVar, iterator);
-        useDU->rotateGrid(iterator, process);
+        useDU->rotateGrid(iterator, process, sendBit);
 
     }
     else if (inputType1 == "receiver")
@@ -72,6 +72,7 @@ int Config::configDU(configVars &cVar)
         std::cerr << e.what() << "\t readFile\n";
         return (1);
     }
+
 
     sendBit->dataDirection = accessFileInt(cfg, "dataDirection");
     sendBit->payloadVersion = accessFileUnSignedInt(cfg, "payloadVersion");

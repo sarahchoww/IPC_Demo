@@ -30,18 +30,16 @@ DU::DU(configVars &cVar, memory_data &iterator)
     else // NR
     {
         std::cout << "RATtype:\t" << cVar.RATtype << std::endl;
-        ;
     }
 }
 
-int DU::rotateGrid(memory_data &iterator, Transfer *&process)
+int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBit)
 {
     int count = 0;
 
     for (iterator.frameId = 0; (int)iterator.frameId < numOfFrames; iterator.frameId++)
     {
         sendBit->frameId = iterator.frameId;
-
 
         for (iterator.subframeId = 0; (int)iterator.subframeId < numOfSubframes; iterator.subframeId++)
         {
@@ -50,7 +48,6 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process)
             for (iterator.slotId = 0; (int)iterator.slotId < numOfSlots; iterator.slotId++)
             {
                 sendBit->slotId = iterator.slotId;
-                std::cout << "number\t" << iterator.slotId << std::endl;
 
                 // Send C-Plane message
                 if (process->run(sendBit) == 1)

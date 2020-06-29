@@ -25,5 +25,5 @@ protected:
 public:
     DU(configVars &cVar, memory_data &iterator);
     ~DU(){};
-    int rotateGrid(memory_data &iterator, Transfer *&process) override;
+    int rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBit);
 };
