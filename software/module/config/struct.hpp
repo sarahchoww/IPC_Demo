@@ -3,9 +3,7 @@
 struct memory_data
 {
     int id;
-
-    //int dataDirection;
-    //unsigned int payloadVersion;
+    
     unsigned int filterIndex;
     unsigned int frameId;
     unsigned int subframeId;
