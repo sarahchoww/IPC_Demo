@@ -35,7 +35,7 @@ const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operat
 
         if (remove(edit) != 0)
         {
-            std::cout << "remove error\n";
+            std::cout << "remove error on " << edit << "\n";
         }
     }
     return NULL;
@@ -101,6 +101,7 @@ void Transfer::display(bitPack *&sendBit)
 {
     std::cout << "DATADIRECTION: " << sendBit->dataDirection;
     std::cout << "\nPAYLOADVER: " << sendBit->payloadVersion;
+    std::cout << "\nNUMOFPRB: " << sendBit->numPrbc;
     std::cout << "\nFRAMEID: " << sendBit->frameId;
     std::cout << "\nSUBFRAMEID: " << sendBit->subframeId;
     std::cout << "\nSLOTID: " << sendBit->slotId;
