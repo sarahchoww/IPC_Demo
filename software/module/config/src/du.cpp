@@ -6,6 +6,8 @@
 DU::DU(configVars &cVar, memory_data &iterator, bitPack_t *&sendBit)
 {
     sendBit->sectionType = 1;
+    sendBit->startPrbc = 0; // For now *******
+
     if (cVar.RATtype == "LTE") // LTE
     {
         numOfFrames = 256; // Follow up
@@ -64,6 +66,11 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBi
 
                     sendBit->startSymbolid = iterator.startSymbolid;
 
+                    for (int countPRBc = 0; countPRBc < 12; countPRBc++) // 12 RE per PRB
+                    {
+                        std::cout << "RESOURCE ELEMENT: " << countPRBc << std::endl;
+                    }
+
                     runResult = process->run(iterator, sendBit);
                     if (runResult == 1) // Failed
                     {
@@ -74,6 +81,18 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBi
                     {
                         return (0);
                     }
+
+                    if (sendBit->startPrbc < sendBit->numPrbc)
+                    {
+                        sendBit->startPrbc += 1; // Go to next PRB
+                        std::cout << "This is PRB number " << sendBit->startPrbc << std::endl;
+                    }
+                    else
+                    {
+                        return (0);
+                    }
+                    
+
                 }
             }
         }
