@@ -23,9 +23,13 @@ DU::DU(configVars &cVar, memory_data &iterator, bitPack_t *&sendBit)
         }
 
         // number of PRBs
-        if (cVar.bandwidth == 5)
+        if (cVar.bandwidth == 1.4)
         {
-            iterator.numPrbc = 25;
+            iterator.numPrbc = 6;
+        }
+        else
+        {
+            iterator.numPrbc = cVar.bandwidth * 5;
         }
     }
     else // NR
@@ -36,7 +40,6 @@ DU::DU(configVars &cVar, memory_data &iterator, bitPack_t *&sendBit)
 
 int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBit)
 {
-    int count = 0;
     int runResult;
 
     for (iterator.frameId = 0; (int)iterator.frameId < numOfFrames; iterator.frameId++)
@@ -52,21 +55,25 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBi
                 sendBit->slotId = iterator.slotId;
 
                 // Send C-Plane message
-                runResult = process->run(iterator, sendBit);
-                if (runResult == 1) // Failed
-                {
-                    std::cout << "run failed\n";
-                    return (1);
-                }
-                else if (runResult == 2) // Timed out
-                {
-                    return(0);
-                }
 
                 for (iterator.startSymbolid = 0; (int)iterator.startSymbolid < numOfSyms; iterator.startSymbolid++)
                 {
                     // Send U-Plane message;
-                    count++;
+                    sendBit->numPrbc = iterator.numPrbc;
+
+
+                    sendBit->startSymbolid = iterator.startSymbolid;
+
+                    runResult = process->run(iterator, sendBit);
+                    if (runResult == 1) // Failed
+                    {
+                        std::cout << "run failed\n";
+                        return (1);
+                    }
+                    else if (runResult == 2) // Timed out
+                    {
+                        return (0);
+                    }
                 }
             }
         }

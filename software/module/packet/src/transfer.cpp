@@ -103,5 +103,6 @@ void Transfer::display(bitPack *&sendBit)
     std::cout << "\nPAYLOADVER: " << sendBit->payloadVersion;
     std::cout << "\nFRAMEID: " << sendBit->frameId;
     std::cout << "\nSUBFRAMEID: " << sendBit->subframeId;
-    std::cout << "\nSLOTID: " << sendBit->slotId << "\n\n";
+    std::cout << "\nSLOTID: " << sendBit->slotId;
+    std::cout << "\nSTARTSYMBID: "<< sendBit->startSymbolid << "\n\n";
 }

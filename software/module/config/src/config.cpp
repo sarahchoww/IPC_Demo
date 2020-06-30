@@ -33,7 +33,6 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
             std::cout << "configDU failed\n";
             return(1);
         }
-
         Config *useDU = new DU(cVar, iterator, sendBit);
         useDU->rotateGrid(iterator, process, sendBit);
 
