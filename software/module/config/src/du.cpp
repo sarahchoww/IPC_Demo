@@ -63,12 +63,16 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBi
                     // Send U-Plane message;
                     sendBit->numPrbc = iterator.numPrbc;
 
-
                     sendBit->startSymbolid = iterator.startSymbolid;
 
-                    for (int countPRBc = 0; countPRBc < 12; countPRBc++) // 12 RE per PRB
+                    for (int blockPRBc = (int)sendBit->startPrbc; blockPRBc < (int)sendBit->numPrbc; blockPRBc++) // 12 RE per PRB
                     {
-                        std::cout << "RESOURCE ELEMENT: " << countPRBc << std::endl;
+                        for (int elePRBc = 0; elePRBc < 12; elePRBc++)
+                        {
+                            std::cout << "RESOURCE BLOCK: " << blockPRBc << std::endl;
+
+                            std::cout << "RESOURCE ELEMENT: " << elePRBc << std::endl;
+                        }
                     }
 
                     runResult = process->run(iterator, sendBit);
@@ -81,18 +85,6 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBi
                     {
                         return (0);
                     }
-
-                    if (sendBit->startPrbc < sendBit->numPrbc)
-                    {
-                        sendBit->startPrbc += 1; // Go to next PRB
-                        std::cout << "This is PRB number " << sendBit->startPrbc << std::endl;
-                    }
-                    else
-                    {
-                        return (0);
-                    }
-                    
-
                 }
             }
         }
