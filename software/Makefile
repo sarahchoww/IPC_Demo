@@ -3,7 +3,7 @@ CFLAGS=-Wall
 
 all: bin/obj bin/sim
 
-bin/sim: bin/obj/main.o bin/obj/config.o bin/obj/transfer.o bin/obj/sender.o bin/obj/receiver.o
+bin/sim: bin/obj/main.o bin/obj/config.o bin/obj/du.o bin/obj/transfer.o bin/obj/sender.o bin/obj/receiver.o
 	$(CC) -o $@ $^ $(CFLAGS) -lrt -pthread -lconfig++
 
 bin/obj:
@@ -11,11 +11,11 @@ bin/obj:
 	mkdir -p $@
 
 run_du: 
-	@cd bin; ./sim receiver
+	@cd bin; ./sim sender
 
 
 run_ru: 
-	@cd bin; ./sim sender
+	@cd bin; ./sim receiver
 
 clean:
 	rm -rf bin/obj
@@ -26,11 +26,14 @@ bin/obj/main.o: module/main/src/main.cpp module/packet/transfer.hpp
 	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
 
 #Config
-bin/obj/config.o: module/config/src/config.cpp module/config/config.hpp module/packet/transfer.hpp module/packet/sender.hpp module/packet/receiver.hpp
+bin/obj/config.o: module/config/src/config.cpp module/config/config.hpp module/config/struct.hpp
+	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
+
+bin/obj/du.o: module/config/src/du.cpp module/config/du.hpp module/config/config.hpp module/config/struct.hpp module/packet/sender.hpp module/packet/receiver.hpp
 	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
 
 # Packet
-bin/obj/transfer.o: module/packet/src/transfer.cpp module/packet/transfer.hpp
+bin/obj/transfer.o: module/packet/src/transfer.cpp module/packet/transfer.hpp module/config/struct.hpp
 	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
 
 bin/obj/sender.o: module/packet/src/sender.cpp module/packet/sender.hpp module/packet/transfer.hpp

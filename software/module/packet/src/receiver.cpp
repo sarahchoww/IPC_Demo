@@ -1,35 +1,32 @@
 #include <packet/receiver.hpp>
 
-Receiver::Receiver(int id)
+Receiver::Receiver(int idValue, bitPack_t *&sendBit)
 {
-    Transfer::setUp(id);
-    setUp(id);
+    Transfer::setUp(idValue);
+    setUp(idValue, sendBit);
 }
 
-Receiver::~Receiver()
-{
-    Transfer::cleanUpMap();
-}
-
-int Receiver::setUp(int id)
+int Receiver::setUp(int idValue, bitPack_t *&sendBit)
 {
 
-    if ((addr = (struct memory_data *)mmap(NULL, sizeof(struct memory_data), PROT_READ, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+    if ((sendBit = (bitPack_t *)mmap(NULL, sizeof(bitPack_t), PROT_READ, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
         return (1);
     }
 
+
     return (0);
 }
 
-int Receiver::run()
+int Receiver::run(memory_data &iterator, bitPack_t *&sendBit)
 {
     bool run = true;
     struct timespec timer;
 
     while (run)
     {
+        
         if (clock_gettime(CLOCK_REALTIME, &timer) == -1) // Get current time and store in timer
         {
             perror("clock_gettime");
@@ -46,7 +43,8 @@ int Receiver::run()
             {
                 run = false;
                 std::cout << "Timed out\n";
-                cleanUpFiles(); // Delete files in shared memory
+                cleanUpFiles(iterator); // Delete files in shared memory
+                cleanUpMap(sendBit);
             }
             else // Error
             {
@@ -64,16 +62,14 @@ int Receiver::run()
             outputTime = asctime(ltime); // Takes in a pointer, converts to string
 
             std::cout << "Receiving\n";
-
-            display();
-
-            std::cout << "\n\n";
+            display(sendBit);
 
             if ((sem_post(semReceived)) == -1) // Notify data has been received
             {
                 std::cout << "Post notify failed\n";
                 return (1);
             }
+            
         }
     }
 

@@ -1,32 +1,5 @@
 #include <packet/transfer.hpp>
-
-void Transfer::display()
-{
-
-    std::cout << outputTime;
-
-    std::cout << "ID: " << std::dec << addr->id
-              << "\t\t\t\t\tIn hex: 0x" << std::hex << addr->id << std::endl;
-
-    std::cout << "Data: ";
-
-    for (int q = 0; q < (ARR_SIZE * 2); q++)
-    {
-        if (q < (ARR_SIZE))
-        {
-            std::cout << "[" << std::dec << addr->arr[q] << "]";
-        }
-        else if (q == ARR_SIZE)
-        {
-            std::cout << "\tIn hex: ";
-        }
-
-        if (q >= (ARR_SIZE))
-        {
-            std::cout << "0x" << std::hex << addr->arr[q - ARR_SIZE] << " ";
-        }
-    }
-}
+#include <vector>
 
 const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operation)
 {
@@ -62,19 +35,18 @@ const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operat
 
         if (remove(edit) != 0)
         {
-            std::cout << "remove error\n";
+            std::cout << "remove error on " << edit << "\n";
         }
     }
     return NULL;
 }
 
 
-int Transfer::setUp(int id)
+int Transfer::setUp(int idValue)
 {
-
-    semNewDataFile = arrangeFiles(SEM_NEWDATA, id, 1);
-    semReceivedFile = arrangeFiles(SEM_RECEIVED, id, 1);
-    fileID = arrangeFiles(FILENAME, id, 1);
+    semReceivedFile = arrangeFiles(SEM_RECEIVED, idValue, 1);
+    semNewDataFile = arrangeFiles(SEM_NEWDATA, idValue, 1);
+    fileID = arrangeFiles(FILENAME, idValue, 1);
 
 
     if ((semNewData = sem_open(semNewDataFile, O_CREAT, 0600, 0)) == SEM_FAILED)
@@ -82,6 +54,7 @@ int Transfer::setUp(int id)
         std::cout << "sem new data failed\n";
         return (1);
     }
+
 
     if ((semReceived = sem_open(semReceivedFile, O_CREAT, 0600, 0)) == SEM_FAILED)
     {
@@ -95,7 +68,7 @@ int Transfer::setUp(int id)
         return (1);
     }
 
-    if ((ftruncate(fileDir, sizeof(struct memory_data))) == -1)
+    if ((ftruncate(fileDir, sizeof(bitPack_t))) == -1)
     {
         std::cout << "truncate fail\n";
         return (1);
@@ -104,21 +77,33 @@ int Transfer::setUp(int id)
     return (0);
 }
 
-void Transfer::cleanUpMap()
+void Transfer::cleanUpMap(bitPack_t *&sendBit)
 {
-    if (munmap(addr, sizeof(struct memory_data)) == -1)
+    if (munmap(sendBit, sizeof(bitPack_t)) == -1)
     {
         std::cout << "munmap failed\n";
     }
 }
 
-void Transfer::cleanUpFiles()
+void Transfer::cleanUpFiles(memory_data &iterator)
 {
     shm_unlink(fileID);
 
     sem_close(semNewData);
     sem_close(semReceived);
 
-    arrangeFiles(semNewDataFile, (addr->id), 2);
-    arrangeFiles(semReceivedFile, (addr->id), 2);
+    arrangeFiles(semNewDataFile, (iterator.id), 2);
+    arrangeFiles(semReceivedFile, (iterator.id), 2);
+}
+
+
+void Transfer::display(bitPack *&sendBit)
+{
+    std::cout << "DATADIRECTION: " << sendBit->dataDirection;
+    std::cout << "\nPAYLOADVER: " << sendBit->payloadVersion;
+    std::cout << "\nNUMOFPRB: " << sendBit->numPrbc;
+    std::cout << "\nFRAMEID: " << sendBit->frameId;
+    std::cout << "\nSUBFRAMEID: " << sendBit->subframeId;
+    std::cout << "\nSLOTID: " << sendBit->slotId;
+    std::cout << "\nSTARTSYMBID: "<< sendBit->startSymbolid << "\n\n";
 }

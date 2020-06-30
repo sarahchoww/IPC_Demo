@@ -3,9 +3,7 @@
 class Sender : public Transfer
 {
 public:
-    int setUp(int id);
-    Sender(int id);
-    ~Sender();
-    int run();
-    void genData();
+    Sender(int idValue, bitPack_t *&sendBit);
+    int setUp(int idValue, bitPack_t *&sendBit);
+    int run(memory_data &iterator, bitPack_t *&sendBit) override;
 };

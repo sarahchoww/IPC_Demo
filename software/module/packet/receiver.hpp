@@ -4,9 +4,9 @@ class Receiver : public Transfer
 {
 
 public:
-    Receiver(int id);
-    ~Receiver();
-    int setUp(int id);
-    int run();
+    Receiver(int idValue, bitPack_t *&sendBit);
+    //~Receiver();
+    int setUp(int idValue, bitPack_t *&sendBit);
+    int run(memory_data &iterator, bitPack_t *&sendBit) override;
 
 };

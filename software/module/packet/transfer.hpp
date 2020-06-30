@@ -1,4 +1,5 @@
 #pragma once
+#include <config/struct.hpp>
 
 // Interface for sender and receiver
 #include <iostream>
@@ -23,19 +24,12 @@
 class Transfer
 {
 protected:
-   struct memory_data
-    {
-        int id;
-        int arr[ARR_SIZE];
-    };
-
     int fileDir;
 
     time_t my_time;
     char *outputTime = nullptr;
     struct tm *ltime; // Local time
 
-    struct memory_data *addr;
 
     sem_t *semNewData, *semReceived;
 
@@ -46,15 +40,14 @@ protected:
 
  
 
-public:
-
+public: 
     virtual ~Transfer() = default;
-    int setUp(int id);
+    int setUp(int idValue);
 
-    virtual int run() = 0;
-    void cleanUpMap();
-    void cleanUpFiles();
+    virtual int run(memory_data &iterator, bitPack_t *&sendBit) = 0;
+    void cleanUpMap(bitPack_t *&sendBit);
+    void cleanUpFiles(memory_data &iterator);
     const char * arrangeFiles(std::string fileToArrange, int id, int operation);
 
-    void display();
+    void display(bitPack *&sendBit);
 };
