@@ -1,9 +1,9 @@
 CC=g++
-CFLAGS=-Wall
+CFLAGS=-Wall -g
 
 all: bin/obj bin/sim
 
-bin/sim: bin/obj/main.o bin/obj/config.o bin/obj/du.o bin/obj/transfer.o bin/obj/sender.o bin/obj/receiver.o
+bin/sim: bin/obj/main.o bin/obj/transfer.o bin/obj/sender.o bin/obj/receiver.o bin/obj/config.o bin/obj/du.o
 	$(CC) -o $@ $^ $(CFLAGS) -lrt -pthread -lconfig++
 
 bin/obj:
@@ -22,14 +22,14 @@ clean:
 	cd bin; rm sim
 
 # Main
-bin/obj/main.o: module/main/src/main.cpp module/packet/transfer.hpp
+bin/obj/main.o: module/main/src/main.cpp module/packet/transfer.hpp module/config/config.hpp
 	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
 
 #Config
-bin/obj/config.o: module/config/src/config.cpp module/config/config.hpp module/config/struct.hpp
+bin/obj/config.o: module/config/src/config.cpp module/config/config.hpp module/config/struct.hpp module/packet/sender.hpp module/packet/receiver.hpp
 	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
 
-bin/obj/du.o: module/config/src/du.cpp module/config/du.hpp module/config/config.hpp module/config/struct.hpp module/packet/sender.hpp module/packet/receiver.hpp
+bin/obj/du.o: module/config/src/du.cpp module/config/du.hpp module/config/config.hpp module/config/struct.hpp
 	$(CC) -c -o $@ $< $(CFLAGS) -Imodule
 
 # Packet

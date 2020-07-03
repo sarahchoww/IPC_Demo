@@ -35,7 +35,7 @@ public:
 
     std::string accessFileStr(libconfig::Config &cfg, std::string paramName);
     unsigned int accessFileUnSignedInt(libconfig::Config &cfg, std::string paramName);
-
+    float accessFileFloat(libconfig::Config &cfg, std::string paramName);
     int accessFileInt(libconfig::Config &cfg, std::string paramName);
 
     virtual int rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBit) {return 1;};

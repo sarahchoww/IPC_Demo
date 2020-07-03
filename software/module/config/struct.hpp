@@ -52,34 +52,3 @@ typedef struct bitPack
 } bitPack_t;
 
 #pragma pack(pop)
-
-
-/*
-typedef struct bitPack
-{
-    int dataDirection;
-    unsigned int payloadVersion;
-    unsigned int filterIndex;
-    unsigned int frameId;
-    unsigned int subframeId;
-    unsigned int slotId;
-    unsigned int startSymbolid;
-    
-    unsigned int numberOfsections;
-    unsigned int sectionType;
-    unsigned int udCompHdr;
-    int reserved;
-    unsigned int sectionId;
-    int rb;
-    int symInc;
-    unsigned int startPrbc;
-    unsigned int numPrbc;
-    unsigned int reMask;
-    unsigned int numSymbol;
-    int ef;
-    unsigned int beamId;    
-    
-
-}bitPack_t;
-
-*/
