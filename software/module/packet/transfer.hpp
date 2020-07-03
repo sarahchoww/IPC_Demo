@@ -12,7 +12,8 @@
 #include <signal.h> // For ctrl-c
 #include <cstring>
 #include <stdio.h>
-#include <fstream> // Check if file exists in system / try to open the file
+#include <sstream> // For arrangeFiles
+
 
 
 #define SEM_NEWDATA "/signal-new-data"

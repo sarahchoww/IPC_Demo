@@ -1,22 +1,28 @@
 #include <packet/transfer.hpp>
 #include <vector>
 
-const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operation)
+const char * Transfer::arrangeFiles(std::string fileToArrange, int id, int operation)
 {
     // Rearrange / append characters and put into const char *
     // Operation 1 : create file
     // Operation 2 : delete file
 
-    int numOffset = 0; // Offset when setting up to delete, need to rid of first slash
+    std::stringstream ss;
+    std::string temp;
+    const char * holderVar;
+
+    if (operation == 1)
+    {
+        fileToArrange.erase(0, 1); // Erase pos 0, len 1 - the backslash
+
+    }
+
 
     char *fileName = new char[fileToArrange.length()];
 
-    if (operation == 2)
-    {
-        numOffset = 1;
-    }
+    holderVar = fileToArrange.c_str(); // Convert string to const char *
 
-    std::copy(fileToArrange.begin() + numOffset, fileToArrange.end(), fileName); // Copy string to a char*, omit the slash
+    strcpy(fileName, holderVar); // Copy data from holderVar to fileName, now a char *
 
     if (operation == 1)
     {
@@ -35,17 +41,18 @@ const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operat
 
         if (remove(edit) != 0)
         {
-            std::cout << "remove error on " << edit << "\n";
+            std::cout << "remove error on \t\t" << edit << "\n";
         }
     }
+
     return NULL;
 }
 
 
 int Transfer::setUp(int idValue)
 {
-    semReceivedFile = arrangeFiles(SEM_RECEIVED, idValue, 1);
     semNewDataFile = arrangeFiles(SEM_NEWDATA, idValue, 1);
+    semReceivedFile = arrangeFiles(SEM_RECEIVED, idValue, 1);
     fileID = arrangeFiles(FILENAME, idValue, 1);
 
 
@@ -91,7 +98,7 @@ void Transfer::cleanUpFiles(memory_data &iterator)
 
     sem_close(semNewData);
     sem_close(semReceived);
-
+    
     arrangeFiles(semNewDataFile, (iterator.id), 2);
     arrangeFiles(semReceivedFile, (iterator.id), 2);
 }

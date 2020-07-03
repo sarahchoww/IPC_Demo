@@ -69,9 +69,9 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBi
                     {
                         for (int elePRBc = 0; elePRBc < 12; elePRBc++)
                         {
-                            std::cout << "RESOURCE BLOCK: " << blockPRBc << std::endl;
+                            //std::cout << "RESOURCE BLOCK: " << blockPRBc << std::endl;
 
-                            std::cout << "RESOURCE ELEMENT: " << elePRBc << std::endl;
+                            //std::cout << "RESOURCE ELEMENT: " << elePRBc << std::endl;
                         }
                     }
 

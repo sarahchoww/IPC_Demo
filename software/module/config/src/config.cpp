@@ -82,7 +82,7 @@ int Config::configDU(configVars &cVar)
     cVar.RATtype = accessFileStr(cfg, "RATtype");
     cVar.numerology = accessFileInt(cfg, "numerology");
     cVar.divisionDuplex = accessFileStr(cfg, "divisionDuplex");
-    cVar.bandwidth = accessFileInt(cfg, "bandwidth");
+    cVar.bandwidth = accessFileFloat(cfg, "bandwidth");
     cVar.prefixType = accessFileStr(cfg, "prefixType");
 
 
@@ -155,6 +155,21 @@ unsigned int Config::accessFileUnSignedInt(libconfig::Config &cfg, std::string p
 int Config::accessFileInt(libconfig::Config &cfg, std::string paramName)
 {
     int num;
+    try
+    {
+        num = cfg.lookup(paramName);
+        std::cout << "From config file " << paramName << ": " << num << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << "\tlookUp\n";
+    }
+    return num;
+}
+
+float Config::accessFileFloat(libconfig::Config &cfg, std::string paramName)
+{
+    float num;
     try
     {
         num = cfg.lookup(paramName);
