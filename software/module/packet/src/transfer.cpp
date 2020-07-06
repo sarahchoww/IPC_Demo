@@ -7,8 +7,6 @@ const char * Transfer::arrangeFiles(std::string fileToArrange, int id, int opera
     // Operation 1 : create file
     // Operation 2 : delete file
 
-    std::stringstream ss;
-    std::string temp;
     const char * holderVar;
 
     if (operation == 1)
