@@ -3,6 +3,7 @@
 #include <packet/sender.hpp>
 #include <config/struct.hpp>
 #include <libconfig.h++>
+#include <bitset>
 
 class Config
 {
@@ -20,7 +21,8 @@ protected:
 
     };
 
-    bitPack_t *sendBit;
+    bitPackCP_t *sendBit;
+    bitPackCP_t sendBitNorm;
 
 
 public:
@@ -38,6 +40,6 @@ public:
     float accessFileFloat(libconfig::Config &cfg, std::string paramName);
     int accessFileInt(libconfig::Config &cfg, std::string paramName);
 
-    virtual int rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBit) {return 1;};
+    virtual int rotateGrid(memory_data &iterator, Transfer *&process, bitPackCP_t *&sendBit) {return 1;};
 
 };

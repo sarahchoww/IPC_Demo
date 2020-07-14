@@ -11,7 +11,6 @@
 #include <semaphore.h> // sem
 #include <signal.h> // For ctrl-c
 #include <cstring>
-#include <stdio.h>
 
 
 
@@ -44,10 +43,10 @@ public:
     virtual ~Transfer() = default;
     int setUp(int idValue);
 
-    virtual int run(memory_data &iterator, bitPack_t *&sendBit) = 0;
-    void cleanUpMap(bitPack_t *&sendBit);
+    virtual int run(memory_data &iterator, bitPackCP_t *&sendBit) = 0;
+    void cleanUpMap(bitPackCP_t *&sendBit);
     void cleanUpFiles(memory_data &iterator);
     const char * arrangeFiles(std::string fileToArrange, int id, int operation);
 
-    void display(bitPack *&sendBit);
+    void display(bitPackCP_t *&sendBit, memory_data &iterator);
 };

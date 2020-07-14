@@ -1,6 +1,6 @@
 #include <packet/sender.hpp>
 
-Sender::Sender(int idValue, bitPack_t *&sendBit)
+Sender::Sender(int idValue, bitPackCP_t *&sendBit)
 {
 
     Transfer::setUp(idValue);
@@ -8,10 +8,10 @@ Sender::Sender(int idValue, bitPack_t *&sendBit)
 }
 
 // Setup the sender
-int Sender::setUp(int idValue, bitPack_t *&sendBit)
+int Sender::setUp(int idValue, bitPackCP_t *&sendBit)
 {
 
-    if ((sendBit = (bitPack_t *)mmap(NULL, sizeof(bitPack_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+    if ((sendBit = (bitPackCP_t *)mmap(NULL, sizeof(bitPackCP_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
         return (1);
@@ -20,7 +20,7 @@ int Sender::setUp(int idValue, bitPack_t *&sendBit)
     return (0);
 }
 
-int Sender::run(memory_data &iterator, bitPack_t *&sendBit)
+int Sender::run(memory_data &iterator, bitPackCP_t *&sendBit)
 {
 
     std::clock_t start;
@@ -43,7 +43,7 @@ int Sender::run(memory_data &iterator, bitPack_t *&sendBit)
     }
 
     std::cout << "Sending\n";
-    display(sendBit);
+    display(sendBit, iterator);
 
     std::cout << "Waiting for data to be received\n\n";
 

@@ -14,8 +14,7 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
     bool idFail;
     configVars cVar;
     memory_data iterator;
-
-
+    sendBit = &sendBitNorm; // To properly access the struct members
 
     // Get ID
     if ((idFail = configID(iterator)) == true)
@@ -40,13 +39,24 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
     else if (inputType1 == "receiver")
     {
         process = new Receiver(idValue, sendBit);
-        
-        if (process->run(iterator, sendBit) == 1)
-        {
-            std::cout << "run failed\n";
-            return (1);
-        }
 
+        //Config *useDU = new DU(cVar, iterator, sendBit);
+        //useDU->swapBits(iterator, process, sendBit);
+
+        while (true)
+        {
+            if (process->run(iterator, sendBit) == 1)
+            {
+                std::cout << "run failed\n";
+                return(1);
+            }
+            else
+            {
+                // Not a failure, but exit out of loop
+                return (0);
+            }
+            
+        }
     }
     else
     {

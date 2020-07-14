@@ -73,7 +73,7 @@ int Transfer::setUp(int idValue)
         return (1);
     }
 
-    if ((ftruncate(fileDir, sizeof(bitPack_t))) == -1)
+    if ((ftruncate(fileDir, sizeof(bitPackCP_t))) == -1)
     {
         std::cout << "truncate fail\n";
         return (1);
@@ -82,9 +82,9 @@ int Transfer::setUp(int idValue)
     return (0);
 }
 
-void Transfer::cleanUpMap(bitPack_t *&sendBit)
+void Transfer::cleanUpMap(bitPackCP_t *&sendBit)
 {
-    if (munmap(sendBit, sizeof(bitPack_t)) == -1)
+    if (munmap(sendBit, sizeof(bitPackCP_t)) == -1)
     {
         std::cout << "munmap failed\n";
     }
@@ -102,13 +102,11 @@ void Transfer::cleanUpFiles(memory_data &iterator)
 }
 
 
-void Transfer::display(bitPack *&sendBit)
+void Transfer::display(bitPackCP_t *&sendBit, memory_data &iterator)
 {
-    std::cout << "DATADIRECTION: " << sendBit->dataDirection;
-    std::cout << "\nPAYLOADVER: " << sendBit->payloadVersion;
-    std::cout << "\nNUMOFPRB: " << sendBit->numPrbc;
-    std::cout << "\nFRAMEID: " << sendBit->frameId;
-    std::cout << "\nSUBFRAMEID: " << sendBit->subframeId;
-    std::cout << "\nSLOTID: " << sendBit->slotId;
-    std::cout << "\nSTARTSYMBID: "<< sendBit->startSymbolid << "\n\n";
+    std::cout << "\nNUMOFPRB: " << iterator.numPrbc;
+    std::cout << "\nFRAMEID: " << iterator.frameId;
+    std::cout << "\nSUBFRAMEID: " << iterator.subframeId;
+    std::cout << "\nSLOTID: " << iterator.slotId;
+    std::cout << "\nSTARTSYMBID: "<< iterator.startSymbolid << "\n\n";
 }

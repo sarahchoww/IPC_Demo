@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -L/cygdrive/c/Users/sachxa/Downloads/libconfig-master/lib/.libs
 
 all: bin/obj bin/sim
 
@@ -8,7 +8,7 @@ bin/sim: bin/obj/main.o bin/obj/transfer.o bin/obj/sender.o bin/obj/receiver.o b
 
 bin/obj:
 	echo here
-	mkdir -p $@
+	mkdir bin/obj
 
 run_du: 
 	@cd bin; ./sim sender

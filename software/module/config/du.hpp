@@ -23,7 +23,9 @@ protected:
     int numOfSyms;
 
 public:
-    DU(configVars &cVar, memory_data &iterator, bitPack_t *&sendBit);
+    DU(configVars &cVar, memory_data &iterator, bitPackCP_t *&sendBit);
     ~DU(){};
-    int rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBit);
+    int rotateGrid(memory_data &iterator, Transfer *&process, bitPackCP_t *&sendBit);
+
+    unsigned int swapBits(unsigned int &num);
 };
