@@ -22,10 +22,10 @@ protected:
     int numOfSlots;
     int numOfSyms;
 
-public:
-    DU(configVars &cVar, memory_data &iterator, bitPackCP_t *&sendBit);
-    ~DU(){};
-    int rotateGrid(memory_data &iterator, Transfer *&process, bitPackCP_t *&sendBit);
+    Transfer *useTransfer;
 
-    unsigned int swapBits(unsigned int &num);
+public:
+    void DUsetUp(configVars &cVar, memory_data &iterator);
+    int rotateGrid(memory_data &iterator, Transfer *&process, int *data, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
+
 };

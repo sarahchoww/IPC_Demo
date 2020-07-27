@@ -1,24 +1,24 @@
 #include <packet/receiver.hpp>
 
-Receiver::Receiver(int idValue, bitPackCP_t *&sendBit)
+Receiver::Receiver(int idValue, int **data)
 {
     Transfer::setUp(idValue);
-    setUp(idValue, sendBit);
+    setUp(data);
 }
 
-int Receiver::setUp(int idValue, bitPackCP_t *&sendBit)
+int Receiver::setUp(int **data)
 {
 
-    if ((sendBit = (bitPackCP_t *)mmap(NULL, sizeof(bitPackCP_t), PROT_READ, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+    if ((*data = (int *)mmap(NULL, sizeof(bitPackCP_t) + sizeof(bitPackUP_t), PROT_READ, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
-        return (1);
+        return (RETURN_FAILURE);
     }
 
     return (0);
 }
 
-int Receiver::run(memory_data &iterator, bitPackCP_t *&sendBit)
+int Receiver::run(memory_data &iterator, int **data)
 {
     struct timespec timer;
 
@@ -38,14 +38,14 @@ int Receiver::run(memory_data &iterator, bitPackCP_t *&sendBit)
         {
             std::cout << "Timed out\n";
             cleanUpFiles(iterator); // Delete files in shared memory
-            cleanUpMap(sendBit);
-            return(2);
+            cleanUpMap(data);
+            return(RETURN_TIMEDOUT);
         }
         else // Error
         {
             std::cout << "sem wait new data failure\n"
                       << errno << std::endl;
-            return (1);
+            return (RETURN_FAILURE);
         }
     }
     else
@@ -57,12 +57,18 @@ int Receiver::run(memory_data &iterator, bitPackCP_t *&sendBit)
         outputTime = asctime(ltime); // Takes in a pointer, converts to string
 
         std::cout << "Receiving\n";
-        display(sendBit, iterator);
+
+
+
+        passThroughEncode(data, sizeof(bitPackCP_t)); // Decode it
+
+        display(data);
+
 
         if ((sem_post(semReceived)) == -1) // Notify data has been received
         {
             std::cout << "Post notify failed\n";
-            return (1);
+            return (RETURN_FAILURE);
         }
     }
 

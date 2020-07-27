@@ -3,15 +3,12 @@
 // cVar is for config variables
 // iterator is for message variables
 
-DU::DU(configVars &cVar, memory_data &iterator, bitPackCP_t *&sendBit)
+void DU::DUsetUp(configVars &cVar, memory_data &iterator)
 {
-    std::cout << "section type\n";
-    iterator.sectionType = 1;
-    //sendBit->sectionType = swapBits(iterator.sectionType);
 
-    std::cout << "startPrbc\n";
+    iterator.sectionType = 1;
+
     iterator.startPrbc = 0; // For now *******
-    //sendBit->startPrbc = swapBits(iterator.startPrbc);
 
     if (cVar.RATtype == "LTE") // LTE
     {
@@ -38,10 +35,6 @@ DU::DU(configVars &cVar, memory_data &iterator, bitPackCP_t *&sendBit)
         {
             iterator.numPrbc = cVar.bandwidth * 5;
         }
-
-        std::cout << "numPRBC\n";
-        //sendBit->numPrbc = iterator.numPrbc;
-        //sendBit->numPrbc = swapBits(iterator.numPrbc);
     }
     else // NR
     {
@@ -49,31 +42,23 @@ DU::DU(configVars &cVar, memory_data &iterator, bitPackCP_t *&sendBit)
     }
 }
 
-int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPackCP_t *&sendBit)
+int DU::rotateGrid(memory_data &iterator, Transfer *&process, int *data, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
 {
+
     int runResult;
     for (iterator.frameId = 0; (int)iterator.frameId < numOfFrames; iterator.frameId++)
     {
-        std::cout << "frameID\n";
-        //sendBit->frameId = swapBits(iterator.frameId);
-
         for (iterator.subframeId = 0; (int)iterator.subframeId < numOfSubframes; iterator.subframeId++)
         {
-            std::cout << "subframeID\n";
-            //sendBit->subframeId = swapBits(iterator.subframeId);
 
             for (iterator.slotId = 0; (int)iterator.slotId < numOfSlots; iterator.slotId++)
             {
-                std::cout << "slotID\n";
-                //sendBit->slotId = swapBits(iterator.slotId);
 
                 // Send C-Plane message
 
                 for (iterator.startSymbolid = 0; (int)iterator.startSymbolid < numOfSyms; iterator.startSymbolid++)
                 {
-                    // Send U-Plane message;
-                    std::cout << "start symbol id\n";
-                    //sendBit->startSymbolid = swapBits(iterator.startSymbolid);
+                    // Send U-Plane message;                    
 
                     /*
                     for (int blockPRBc = (int)sendBit->startPrbc; blockPRBc < (int)sendBit->numPrbc; blockPRBc++) // 12 RE per PRB
@@ -86,16 +71,21 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPackCP_t *&send
                         }
                     }
 */
-                    runResult = process->run(iterator, sendBit);
-                    if (runResult == 1) // Failed
+                    runResult = process->run(iterator, &data);
+                    if (runResult == RETURN_FAILURE) // Failed
                     {
                         std::cout << "run failed\n";
-                        return (1);
+                        return (RETURN_FAILURE);
                     }
-                    else if (runResult == 2) // Timed out
+                    else if (runResult == RETURN_TIMEDOUT) // Timed out
                     {
-                        return (0);
+                        return (RETURN_TIMEDOUT);
                     }
+
+
+
+                    useTransfer->sendForPack(&data, iterator, CPstruct, UPstruct);
+                    // Pack after display output so data isn't skewed, this will be removed later
                 }
             }
         }
@@ -103,6 +93,7 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPackCP_t *&send
     return (0);
 }
 
+/*
 unsigned int DU::swapBits(unsigned int &num) // For unsigned int values
 {
     std::cout << "value\t" << std::dec << (num) << std::endl;
@@ -120,3 +111,4 @@ unsigned int DU::swapBits(unsigned int &num) // For unsigned int values
     std::cout << std::endl;
     return (num);
 }
+*/

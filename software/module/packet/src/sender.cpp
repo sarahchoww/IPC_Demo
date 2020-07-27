@@ -1,28 +1,29 @@
 #include <packet/sender.hpp>
 
-Sender::Sender(int idValue, bitPackCP_t *&sendBit)
+Sender::Sender(int idValue, int **data)
 {
-
     Transfer::setUp(idValue);
-    setUp(idValue, sendBit);
+    setUp(data);
+
 }
 
 // Setup the sender
-int Sender::setUp(int idValue, bitPackCP_t *&sendBit)
+int Sender::setUp(int **data)
 {
-
-    if ((sendBit = (bitPackCP_t *)mmap(NULL, sizeof(bitPackCP_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+    std::cout << "mmap 1\t" << *data << std::endl;
+    if ((*data = (int *)mmap(NULL, sizeof(bitPackCP_t) + sizeof(bitPackUP_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
-        return (1);
+        return (RETURN_FAILURE);
     }
+
+    std::cout << "mmap 2 \t" << *data << std::endl;
 
     return (0);
 }
 
-int Sender::run(memory_data &iterator, bitPackCP_t *&sendBit)
+int Sender::run(memory_data &iterator, int **data)
 {
-
     std::clock_t start;
     double duration;
 
@@ -39,11 +40,11 @@ int Sender::run(memory_data &iterator, bitPackCP_t *&sendBit)
     if ((sem_post(semNewData)) == -1) // Signal new information, unblock
     {
         std::cout << "sem post new data failure loop\n";
-        return (1);
+        return (RETURN_FAILURE);
     }
 
     std::cout << "Sending\n";
-    display(sendBit, iterator);
+    display(iterator);
 
     std::cout << "Waiting for data to be received\n\n";
 
@@ -61,13 +62,13 @@ int Sender::run(memory_data &iterator, bitPackCP_t *&sendBit)
         {
             std::cout << "Timed out\n";
             cleanUpFiles(iterator); // Delete files in shared memory
-            cleanUpMap(sendBit);
-            return (2);
+            cleanUpMap(data);
+            return (RETURN_TIMEDOUT);
         }
         else // Error
         {
             std::cout << "sem wait received failed\n";
-            return (1);
+            return (RETURN_FAILURE);
         }
     }
     else
@@ -79,5 +80,6 @@ int Sender::run(memory_data &iterator, bitPackCP_t *&sendBit)
             // Take current clock minus clock from start divided by ticks per second
         }
     }
+
     return (0);
 }
