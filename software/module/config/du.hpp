@@ -26,6 +26,6 @@ protected:
 
 public:
     void DUsetUp(configVars &cVar, memory_data &iterator);
-    int rotateGrid(memory_data &iterator, Transfer *&process, int *data, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
+    int rotateGrid(memory_data &iterator, Transfer *&process, uint8_t data[], bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
 
 };

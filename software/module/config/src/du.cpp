@@ -6,6 +6,7 @@
 void DU::DUsetUp(configVars &cVar, memory_data &iterator)
 {
 
+
     iterator.sectionType = 1;
 
     iterator.startPrbc = 0; // For now *******
@@ -42,7 +43,7 @@ void DU::DUsetUp(configVars &cVar, memory_data &iterator)
     }
 }
 
-int DU::rotateGrid(memory_data &iterator, Transfer *&process, int *data, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
+int DU::rotateGrid(memory_data &iterator, Transfer *&process, uint8_t data[], bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
 {
 
     int runResult;
@@ -71,7 +72,38 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, int *data, bitPack
                         }
                     }
 */
-                    runResult = process->run(iterator, &data);
+
+std::cout << "\nDATADIR: " << iterator.dataDirection;
+std::cout << "\nPAYLOADVER: " << iterator.payloadVersion;
+std::cout << "\nFILTERINDEX: " << iterator.filterIndex;
+std::cout << "\nFRAMEID: " << iterator.frameId;
+std::cout << "\nSUBFRAMEID: " << iterator.subframeId;
+std::cout << "\nSLOTID: " << iterator.slotId;
+std::cout << "\nSTARTSYMBID: " << iterator.startSymbolid;
+
+std::cout << "\nNUMOFSECTIONS: " << iterator.numberOfsections;
+std::cout << "\nSECTIONTYPE: " << iterator.sectionType;
+
+std::cout << "\nudcomphdr: " << iterator.udCompHdr;
+std::cout << "\nreserved: " << iterator.reserved;
+std::cout << "\nrb: " << iterator.rb;
+std::cout << "\nsyminc: " << iterator.symInc;
+std::cout << "\nstartprbc: " << iterator.startPrbc;
+
+
+    std::cout << "\nNUMOFPRB: " << iterator.numPrbc;
+
+std::cout << "\nremask: " << iterator.reMask;
+std::cout << "\nnumsymbol: " << iterator.numSymbol;
+std::cout << "\nef: " << iterator.ef;
+std::cout << "\nbeamid: " << iterator.beamId << "\n\n";
+
+
+std::string test;
+//std::cin >> test;
+
+
+                    runResult = process->run(iterator, data);
                     if (runResult == RETURN_FAILURE) // Failed
                     {
                         std::cout << "run failed\n";
@@ -84,7 +116,8 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, int *data, bitPack
 
 
 
-                    useTransfer->sendForPack(&data, iterator, CPstruct, UPstruct);
+
+                    useTransfer->sendForPack(data, iterator, CPstruct, UPstruct);
                     // Pack after display output so data isn't skewed, this will be removed later
                 }
             }

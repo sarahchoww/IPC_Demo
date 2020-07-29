@@ -50,6 +50,7 @@ typedef struct bitPackCP
     unsigned int numSymbol : 4;
     int ef : 1;
     unsigned int beamId : 15;    
+    
 } bitPackCP_t;
 #pragma pack(pop)
 

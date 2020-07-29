@@ -50,16 +50,16 @@ public:
     virtual ~Transfer() = default;
 
     int setUp(int idValue);
-    virtual int run(memory_data &iterator, int **data) = 0;
-    void display(memory_data &iterator);
+    virtual int run(memory_data &iterator, uint8_t data[]) = 0;
+    void display(uint8_t *data);
 
     const char * arrangeFiles(std::string fileToArrange, int id, int operation);
-    void cleanUpMap(int **data);
+    void cleanUpMap(uint8_t data[]);
     void cleanUpFiles(memory_data &iterator);
 
-    void sendForPack(int **data, memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
+    void sendForPack(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
     //void sendForPack(bitPackUP_t *&sendBit, memory_data &iterator);
 
-    void passThroughEncode(int **data, size_t size);
+    void passThroughEncode(uint8_t data[], size_t size);
 
 };

@@ -10,6 +10,7 @@ class DU;
 int Config::type(Transfer *&process, char *argv[]) // Change reference to a pointer
 {
 
+    setToZero();
 
     // Convert argv[1] to a string by copying it
     std::string inputType1(argv[1]);
@@ -33,29 +34,22 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
     if (inputType1 == "sender")
     {
 
-        std::cout << "data before\t" << data << std::endl;
+        //std::cout << "data before\t" << &data << "\tvalue\t" << data << std::endl;
+        printf("BEFORE: Address: %p\tValue:  %p\n", &data, data );
         
         process = new Sender(idValue, &data);
 
-        std::cout << "data after\t" << data << std::endl;
-
-/*
-       uint8_t *val;
-
-	uint8_t **ptr1 = &val;
+        //std::cout << "data after\t" << &data << "\tvalue\t" << data << std::endl;
+        printf("AFTER: Address: %p\tValue:  %p\n", &data, data );
 
 
-	std::cout << "\nval\t" << val << "\nptr1\t" << *ptr1 << std::endl;
- */
+        bitPackCP_t *CPstruct = (struct bitPackCP *) data;
+        bitPackUP_t *UPstruct = (struct bitPackUP *) data; // Access UP data but point to data
+
+        //std::cout << "\npoointer 1\t" << CPstruct << "\npointer 2\t" << UPstruct << "\npointer 3\t" << data << std::endl;
+        printf("pointer1: %p\t pointer2:  %p\t pointer 3: %p\n", CPstruct, UPstruct, data );
 
 
-    bitPackCP_t *CPstruct = (struct bitPackCP *) data;
-    bitPackUP_t *UPstruct = (struct bitPackUP *) data; // Access UP data but point to data
-
-    std::cout << "\nnew\npoointer 1\t" << CPstruct << "\npointer 2\t" << UPstruct << "\npointer 3\t" << data << std::endl;
-
-    std::string test;
-    //std::cin >> test;
 
         if (configDU() == RETURN_FAILURE)
         {
@@ -63,26 +57,26 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
             return(RETURN_FAILURE);
         }
         Config *useDU = new DU();
+
         useDU->DUsetUp(cVar, iterator);
+
 
         if ((useDU->rotateGrid(iterator, process, data, CPstruct, UPstruct)) == RETURN_TIMEDOUT)
         {
             delete useDU;
             return(0);
         }
-        
-
-
+ 
         delete useDU;
-
     }
     else if (inputType1 == "receiver")
     {
+
         process = new Receiver(idValue, &data);
 
         while (true)
         {
-            result = process->run(iterator, &data);
+            result = process->run(iterator, data);
 
             if (result == RETURN_FAILURE)
             {
@@ -162,4 +156,28 @@ bool Config::configID()
     }
 
     return false;
+}
+
+void Config::setToZero()
+{
+    iterator.dataDirection = 0;
+    iterator.payloadVersion = 0;
+    iterator.filterIndex = 0;
+    iterator.frameId = 0;
+    iterator.subframeId = 0;
+    iterator.slotId = 0;
+    iterator.startSymbolid = 0;
+    iterator.numberOfsections = 0;
+    iterator.sectionType = 0;
+    iterator.udCompHdr = 0;
+    iterator.reserved = 0;
+    iterator.sectionId = 0;
+    iterator.rb = 0;
+    iterator.symInc = 0;
+    iterator.startPrbc = 0;
+    iterator.numPrbc = 0;
+    iterator.reMask = 0;
+    iterator.numSymbol = 0;
+    iterator.ef = 0;
+    iterator.beamId = 0;
 }

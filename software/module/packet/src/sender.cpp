@@ -1,6 +1,6 @@
 #include <packet/sender.hpp>
 
-Sender::Sender(int idValue, int **data)
+Sender::Sender(int idValue, uint8_t **data)
 {
     Transfer::setUp(idValue);
     setUp(data);
@@ -8,21 +8,27 @@ Sender::Sender(int idValue, int **data)
 }
 
 // Setup the sender
-int Sender::setUp(int **data)
+int Sender::setUp(uint8_t **data)
 {
-    std::cout << "mmap 1\t" << *data << std::endl;
-    if ((*data = (int *)mmap(NULL, sizeof(bitPackCP_t) + sizeof(bitPackUP_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+
+    //std::cout << "mmap 1\t" << &(*data) << "\tvalue\t" << *data << std::endl;
+    printf("mmap1: Address: %p\tValue:  %p\n", &(*data), *data );
+
+ 
+    if ((*data = (uint8_t *)mmap(NULL, sizeof(bitPackCP_t) + sizeof(bitPackUP_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
         return (RETURN_FAILURE);
     }
 
-    std::cout << "mmap 2 \t" << *data << std::endl;
+    //std::cout << "mmap 2\t" << &(*data) << "\tvalue\t" << *data << std::endl;
+    printf("mmap2: Address: %p\tValue:  %p\n", &(*data), *data );
+
 
     return (0);
 }
 
-int Sender::run(memory_data &iterator, int **data)
+int Sender::run(memory_data &iterator, uint8_t data[])
 {
     std::clock_t start;
     double duration;
@@ -44,7 +50,7 @@ int Sender::run(memory_data &iterator, int **data)
     }
 
     std::cout << "Sending\n";
-    display(iterator);
+    //display(data);
 
     std::cout << "Waiting for data to be received\n\n";
 

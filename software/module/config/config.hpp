@@ -5,7 +5,6 @@
 
 #include <packet/receiver.hpp>
 #include <packet/sender.hpp>
-//#include <packet/transfer.hpp>
 #include <config/struct.hpp>
 
 #define RETURN_FAILURE 1
@@ -39,7 +38,7 @@ public:
     int idValue;
 
 
-    int *data;
+    uint8_t *data;
 
     int type(Transfer *&process, char *argv[]);
     // Double pointer, single pointer makes a copy of the data, double is the address
@@ -72,9 +71,9 @@ public:
     unsigned int accessFileUnSignedInt(libconfig::Config &cfg, std::string paramName);
     float accessFileFloat(libconfig::Config &cfg, std::string paramName);
     int accessFileInt(libconfig::Config &cfg, std::string paramName);
-
+    void setToZero();
 
     virtual void DUsetUp(configVars &cVar, memory_data &iterator){};
-    virtual int rotateGrid(memory_data &iterator, Transfer *&process, int *data, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct) {return 1;};
+    virtual int rotateGrid(memory_data &iterator, Transfer *&process, uint8_t data[], bitPackCP_t *CPstruct, bitPackUP_t *UPstruct) {return 1;};
 
 };

@@ -3,7 +3,7 @@
 class Sender : public Transfer
 {
 public:
-    Sender(int idValue, int **data);
-    int setUp(int **data);
-    int run(memory_data &iterator, int **data) override;
+    Sender(int idValue, uint8_t **data);
+    int setUp(uint8_t **data);
+    int run(memory_data &iterator, uint8_t data[]) override;
 };

@@ -77,9 +77,9 @@ int Transfer::setUp(int idValue)
     return (0);
 }
 
-void Transfer::cleanUpMap(int **data)
+void Transfer::cleanUpMap(uint8_t data[])
 {
-    if (munmap(*data, sizeof(bitPackCP_t) + sizeof(bitPackUP_t)) == -1)
+    if (munmap(data, sizeof(bitPackCP_t) + sizeof(bitPackUP_t)) == -1)
     {
         std::cout << "munmap failed\n";
     }
@@ -97,30 +97,20 @@ void Transfer::cleanUpFiles(memory_data &iterator)
     arrangeFiles(semReceivedFile, (iterator.id), 2);
 }
 
-void Transfer::display(memory_data &iterator)
+/*
+void Transfer::display(uint8_t *data)
 {
-    std::cout << "\nNUMOFPRB: " << iterator.numPrbc;
-    std::cout << "\nFRAMEID: " << iterator.frameId;
-    std::cout << "\nSUBFRAMEID: " << iterator.subframeId;
-    std::cout << "\nSLOTID: " << iterator.slotId;
-    std::cout << "\nSTARTSYMBID: " << iterator.startSymbolid << "\n\n";
+    std::cout << "\nNUMOFPRB: " << data[];
+    std::cout << "\nFRAMEID: " << data[];
+    std::cout << "\nSUBFRAMEID: " << data[];
+    std::cout << "\nSLOTID: " << data[];
+    std::cout << "\nSTARTSYMBID: " << data[] << "\n\n";
 }
+*/
 
 // function override, not template
-void Transfer::sendForPack(int **data, memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
+void Transfer::sendForPack(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
 {
-    /*
-    struct bitPackCP *CPstruct = (struct bitPackCP *) data;
-    bitPackUP_t *UPstruct = (struct bitPackUP *) data; // Access UP data but point to data
-
-    
-    std::cout << "poointer 1\t" << CPstruct << "\npointer 2\t" << UPstruct << "\npointer 3\t" << &data << std::endl;
-
-    std::string test;
-    std::cin >> test;
-
-    */
-
 
     CPstruct->dataDirection = iterator.dataDirection;
     CPstruct->payloadVersion = iterator.payloadVersion;
@@ -137,16 +127,19 @@ void Transfer::sendForPack(int **data, memory_data &iterator, bitPackCP_t *CPstr
     CPstruct->rb = iterator.rb;
     CPstruct->symInc = iterator.symInc;
     CPstruct->startPrbc = iterator.startPrbc;
+    CPstruct->numPrbc = iterator.numPrbc;
     CPstruct->reMask = iterator.reMask;
     CPstruct->numSymbol = iterator.numSymbol;
     CPstruct->ef = iterator.ef;
     CPstruct->beamId = iterator.beamId;
 
+
+
     passThroughEncode(data, sizeof(bitPackCP_t));
 
 }
 
-void Transfer::passThroughEncode(int **data, size_t size)
+void Transfer::passThroughEncode(uint8_t data[], size_t size)
 {
     useEnc.encodeData(data, size);
 }

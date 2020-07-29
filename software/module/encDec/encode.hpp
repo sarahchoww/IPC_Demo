@@ -6,6 +6,6 @@
 class Encode
 {
 public:
-    void encodeData(int **data, size_t size);
+    void encodeData(uint8_t data[], size_t size);
 
 };

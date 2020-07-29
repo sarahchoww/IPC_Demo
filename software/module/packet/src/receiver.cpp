@@ -1,15 +1,15 @@
 #include <packet/receiver.hpp>
 
-Receiver::Receiver(int idValue, int **data)
+Receiver::Receiver(int idValue, uint8_t **data)
 {
     Transfer::setUp(idValue);
     setUp(data);
 }
 
-int Receiver::setUp(int **data)
+int Receiver::setUp(uint8_t **data)
 {
 
-    if ((*data = (int *)mmap(NULL, sizeof(bitPackCP_t) + sizeof(bitPackUP_t), PROT_READ, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+    if ((*data = (uint8_t *)mmap(NULL, sizeof(bitPackCP_t) + sizeof(bitPackUP_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
         return (RETURN_FAILURE);
@@ -18,7 +18,7 @@ int Receiver::setUp(int **data)
     return (0);
 }
 
-int Receiver::run(memory_data &iterator, int **data)
+int Receiver::run(memory_data &iterator, uint8_t data[])
 {
     struct timespec timer;
 
@@ -32,6 +32,8 @@ int Receiver::run(memory_data &iterator, int **data)
 
     std::cout << "Waiting for data\n";
 
+
+/*
     if ((sem_timedwait(semNewData, &timer)) == -1) // Wait for signal
     {
         if (errno == ETIMEDOUT) // Timed out
@@ -48,6 +50,14 @@ int Receiver::run(memory_data &iterator, int **data)
             return (RETURN_FAILURE);
         }
     }
+*/
+
+    if ((sem_wait(semNewData)) == -1) // Wait for signal
+    {
+            std::cout << "sem wait new data failure\n"
+                      << errno << std::endl;
+            return (RETURN_FAILURE);
+    }
     else
     {
 
@@ -62,7 +72,7 @@ int Receiver::run(memory_data &iterator, int **data)
 
         passThroughEncode(data, sizeof(bitPackCP_t)); // Decode it
 
-        display(data);
+        //display(data);
 
 
         if ((sem_post(semReceived)) == -1) // Notify data has been received
