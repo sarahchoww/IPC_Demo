@@ -1,5 +1,6 @@
 #pragma once
 #include <config/struct.hpp>
+#include <encDec/encode.hpp>
 
 // Interface for sender and receiver
 #include <iostream>
@@ -11,11 +12,10 @@
 #include <semaphore.h> // sem
 #include <signal.h> // For ctrl-c
 #include <cstring>
-#include <stdio.h>
-#include <sstream> // For arrangeFiles
 
 
-
+#define RETURN_FAILURE 1
+#define RETURN_TIMEDOUT 2
 #define SEM_NEWDATA "/signal-new-data"
 #define SEM_RECEIVED "/wait-received"
 #define FILENAME "/testSHM"
@@ -32,23 +32,34 @@ protected:
     struct tm *ltime; // Local time
 
 
-    sem_t *semNewData, *semReceived;
+    sem_t *semNewData;
+    sem_t *semReceived;
 
     const char * semNewDataFile;
     const char * semReceivedFile;
     const char * fileID;
 
 
- 
+    //char data[1024]; // For both CP and UP
+    //bitPackUP_t *UPstruct = (struct bitPackUP *) data; // Access UP data but point to data
+
+    Encode useEnc;
 
 public: 
+
     virtual ~Transfer() = default;
+
     int setUp(int idValue);
+    virtual int run(memory_data &iterator, uint8_t data[]) = 0;
+    void display(uint8_t *data);
 
-    virtual int run(memory_data &iterator, bitPack_t *&sendBit) = 0;
-    void cleanUpMap(bitPack_t *&sendBit);
-    void cleanUpFiles(memory_data &iterator);
     const char * arrangeFiles(std::string fileToArrange, int id, int operation);
+    void cleanUpMap(uint8_t data[]);
+    void cleanUpFiles(memory_data &iterator);
 
-    void display(bitPack *&sendBit);
+    void sendForPack(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
+    //void sendForPack(bitPackUP_t *&sendBit, memory_data &iterator);
+
+    void passThroughEncode(uint8_t data[], size_t size);
+
 };

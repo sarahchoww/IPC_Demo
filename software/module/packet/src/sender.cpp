@@ -1,28 +1,35 @@
 #include <packet/sender.hpp>
 
-Sender::Sender(int idValue, bitPack_t *&sendBit)
+Sender::Sender(int idValue, uint8_t **data)
 {
-
     Transfer::setUp(idValue);
-    setUp(idValue, sendBit);
+    setUp(data);
+
 }
 
 // Setup the sender
-int Sender::setUp(int idValue, bitPack_t *&sendBit)
+int Sender::setUp(uint8_t **data)
 {
 
-    if ((sendBit = (bitPack_t *)mmap(NULL, sizeof(bitPack_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
+    //std::cout << "mmap 1\t" << &(*data) << "\tvalue\t" << *data << std::endl;
+    printf("mmap1: Address: %p\tValue:  %p\n", &(*data), *data );
+
+ 
+    if ((*data = (uint8_t *)mmap(NULL, sizeof(bitPackCP_t) + sizeof(bitPackUP_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
     {
         std::cout << "mmap failed\n";
-        return (1);
+        return (RETURN_FAILURE);
     }
+
+    //std::cout << "mmap 2\t" << &(*data) << "\tvalue\t" << *data << std::endl;
+    printf("mmap2: Address: %p\tValue:  %p\n", &(*data), *data );
+
 
     return (0);
 }
 
-int Sender::run(memory_data &iterator, bitPack_t *&sendBit)
+int Sender::run(memory_data &iterator, uint8_t data[])
 {
-
     std::clock_t start;
     double duration;
 
@@ -39,11 +46,11 @@ int Sender::run(memory_data &iterator, bitPack_t *&sendBit)
     if ((sem_post(semNewData)) == -1) // Signal new information, unblock
     {
         std::cout << "sem post new data failure loop\n";
-        return (1);
+        return (RETURN_FAILURE);
     }
 
     std::cout << "Sending\n";
-    display(sendBit);
+    //display(data);
 
     std::cout << "Waiting for data to be received\n\n";
 
@@ -61,13 +68,13 @@ int Sender::run(memory_data &iterator, bitPack_t *&sendBit)
         {
             std::cout << "Timed out\n";
             cleanUpFiles(iterator); // Delete files in shared memory
-            cleanUpMap(sendBit);
-            return (2);
+            cleanUpMap(data);
+            return (RETURN_TIMEDOUT);
         }
         else // Error
         {
             std::cout << "sem wait received failed\n";
-            return (1);
+            return (RETURN_FAILURE);
         }
     }
     else
@@ -79,5 +86,6 @@ int Sender::run(memory_data &iterator, bitPack_t *&sendBit)
             // Take current clock minus clock from start divided by ticks per second
         }
     }
+
     return (0);
 }

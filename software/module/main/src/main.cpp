@@ -1,6 +1,5 @@
 // Sender and receiver program
 
-#include <packet/transfer.hpp>
 #include <config/config.hpp>
 
 #include <iostream>

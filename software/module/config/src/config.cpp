@@ -9,59 +9,101 @@ class DU;
 
 int Config::type(Transfer *&process, char *argv[]) // Change reference to a pointer
 {
+
+    setToZero();
+
     // Convert argv[1] to a string by copying it
     std::string inputType1(argv[1]);
     bool idFail;
-    configVars cVar;
-    memory_data iterator;
+    sendBit = &sendBitNorm; // To properly access the struct members
 
 
+    libconfig::Config cfg;
+    cfg.setIncludeDir("software/bin");
+
+    int result; // For the status of receiver
 
     // Get ID
-    if ((idFail = configID(iterator)) == true)
+    if ((idFail = configID()) == true)
     {
         std::cout << "ID error\n";
-        return (1);
+        return (RETURN_FAILURE);
     }
 
 
     if (inputType1 == "sender")
     {
-        process = new Sender(idValue, sendBit);
-        if (configDU(cVar) == 1)
+
+        //std::cout << "data before\t" << &data << "\tvalue\t" << data << std::endl;
+        printf("BEFORE: Address: %p\tValue:  %p\n", &data, data );
+        
+        process = new Sender(idValue, &data);
+
+        //std::cout << "data after\t" << &data << "\tvalue\t" << data << std::endl;
+        printf("AFTER: Address: %p\tValue:  %p\n", &data, data );
+
+
+        bitPackCP_t *CPstruct = (struct bitPackCP *) data;
+        bitPackUP_t *UPstruct = (struct bitPackUP *) data; // Access UP data but point to data
+
+        //std::cout << "\npoointer 1\t" << CPstruct << "\npointer 2\t" << UPstruct << "\npointer 3\t" << data << std::endl;
+        printf("pointer1: %p\t pointer2:  %p\t pointer 3: %p\n", CPstruct, UPstruct, data );
+
+
+
+        if (configDU() == RETURN_FAILURE)
         {
             std::cout << "configDU failed\n";
-            return(1);
+            return(RETURN_FAILURE);
         }
-        Config *useDU = new DU(cVar, iterator, sendBit);
-        useDU->rotateGrid(iterator, process, sendBit);
+        Config *useDU = new DU();
 
+        useDU->DUsetUp(cVar, iterator);
+
+
+        if ((useDU->rotateGrid(iterator, process, data, CPstruct, UPstruct)) == RETURN_TIMEDOUT)
+        {
+            delete useDU;
+            return(0);
+        }
+ 
+        delete useDU;
     }
     else if (inputType1 == "receiver")
     {
-        process = new Receiver(idValue, sendBit);
-        
-        if (process->run(iterator, sendBit) == 1)
-        {
-            std::cout << "run failed\n";
-            return (1);
-        }
 
+        process = new Receiver(idValue, &data);
+
+        while (true)
+        {
+            result = process->run(iterator, data);
+
+            if (result == RETURN_FAILURE)
+            {
+                std::cout << "run failed\n";
+                return(RETURN_FAILURE);
+            }
+            else if (result == RETURN_TIMEDOUT)
+            {
+                // Not a failure, but exit out of loop
+                
+                return (0);
+            }
+            
+        }
     }
     else
     {
         std::cout << "Invalid entry\n";
-        return (1);
+        return (RETURN_TIMEDOUT);
     }
 
+    delete sendBit;
     return (0);
 }
 
-int Config::configDU(configVars &cVar)
+int Config::configDU()
 {
-    libconfig::Config cfg;
-    cfg.setIncludeDir("software/bin");
-
     try
     {
         cfg.readFile("config/configDU.cfg");
@@ -69,31 +111,27 @@ int Config::configDU(configVars &cVar)
     catch (const std::exception &e)
     {
         std::cerr << e.what() << "\t readFile\n";
-        return (1);
+        return (RETURN_FAILURE);
     }
 
 
-    sendBit->dataDirection = accessFileInt(cfg, "dataDirection");
-    sendBit->payloadVersion = accessFileUnSignedInt(cfg, "payloadVersion");
+    accessFile(cfg, "dataDirection", iterator.dataDirection);
+    accessFile(cfg, "payloadVersion", iterator.payloadVersion);
 
-    cVar.bandSectorId = accessFileInt(cfg, "bandSectorId");
-    cVar.CCid = accessFileInt(cfg, "CCid");
-    cVar.DUPortId = accessFileInt(cfg, "DUPortId");
-    cVar.RATtype = accessFileStr(cfg, "RATtype");
-    cVar.numerology = accessFileInt(cfg, "numerology");
-    cVar.divisionDuplex = accessFileStr(cfg, "divisionDuplex");
-    cVar.bandwidth = accessFileFloat(cfg, "bandwidth");
-    cVar.prefixType = accessFileStr(cfg, "prefixType");
-
+    accessFile(cfg, "bandSectorId", cVar.bandSectorId);
+    accessFile(cfg, "CCid", cVar.CCid);
+    accessFile(cfg, "DUPortId", cVar.DUPortId);
+    accessFile(cfg, "RATtype", cVar.RATtype);
+    accessFile(cfg, "numerology", cVar.numerology);
+    accessFile(cfg, "divisionDuplex", cVar.divisionDuplex);
+    accessFile(cfg, "bandwidth", cVar.bandwidth);
+    accessFile(cfg, "prefixType", cVar.prefixType);
 
     return(0);
 }
 
-bool Config::configID(memory_data &iterator)
+bool Config::configID()
 {
-    libconfig::Config cfg;
-    cfg.setIncludeDir("software/bin");
-
     try
     {
         cfg.readFile("config/configID.cfg");
@@ -120,64 +158,26 @@ bool Config::configID(memory_data &iterator)
     return false;
 }
 
-std::string Config::accessFileStr(libconfig::Config &cfg, std::string paramName)
+void Config::setToZero()
 {
-    try
-    {
-        std::string passStr = cfg.lookup(paramName);
-        std::cout << "From config file " << paramName << ": " << passStr << std::endl;
-        return passStr;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << "\tlookUp\n";
-    }
-    return NULL;
-}
-
-unsigned int Config::accessFileUnSignedInt(libconfig::Config &cfg, std::string paramName)
-{
-    unsigned int num;
-    try
-    {
-        num = cfg.lookup(paramName);
-        std::cout << "From config file " << paramName << ": " << num << std::endl;
-        return num;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << "\tlookUp\n";
-    }
-    return num;
-}
-
-
-int Config::accessFileInt(libconfig::Config &cfg, std::string paramName)
-{
-    int num;
-    try
-    {
-        num = cfg.lookup(paramName);
-        std::cout << "From config file " << paramName << ": " << num << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << "\tlookUp\n";
-    }
-    return num;
-}
-
-float Config::accessFileFloat(libconfig::Config &cfg, std::string paramName)
-{
-    float num;
-    try
-    {
-        num = cfg.lookup(paramName);
-        std::cout << "From config file " << paramName << ": " << num << std::endl;
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << "\tlookUp\n";
-    }
-    return num;
+    iterator.dataDirection = 0;
+    iterator.payloadVersion = 0;
+    iterator.filterIndex = 0;
+    iterator.frameId = 0;
+    iterator.subframeId = 0;
+    iterator.slotId = 0;
+    iterator.startSymbolid = 0;
+    iterator.numberOfsections = 0;
+    iterator.sectionType = 0;
+    iterator.udCompHdr = 0;
+    iterator.reserved = 0;
+    iterator.sectionId = 0;
+    iterator.rb = 0;
+    iterator.symInc = 0;
+    iterator.startPrbc = 0;
+    iterator.numPrbc = 0;
+    iterator.reMask = 0;
+    iterator.numSymbol = 0;
+    iterator.ef = 0;
+    iterator.beamId = 0;
 }
