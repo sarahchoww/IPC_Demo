@@ -99,8 +99,6 @@ std::cout << "\nef: " << iterator.ef;
 std::cout << "\nbeamid: " << iterator.beamId << "\n\n";
 
 
-std::string test;
-//std::cin >> test;
 
 
                     runResult = process->run(iterator, data);
@@ -117,7 +115,12 @@ std::string test;
 
 
 
-                    useTransfer->sendForPack(data, iterator, CPstruct, UPstruct);
+                    useTransfer->packCP(data, iterator, CPstruct, UPstruct);
+                    if (useTransfer->passThroughEncode(data, sizeof(bitPackCP_t)) == RETURN_FAILURE)
+                    {
+                        return (RETURN_FAILURE);
+                    }
+
                     // Pack after display output so data isn't skewed, this will be removed later
                 }
             }

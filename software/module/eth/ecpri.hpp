@@ -12,12 +12,12 @@
 #include <net/if.h>
 #include <netinet/ether.h>
 
-#define MY_DEST_MAC0	0x00
-#define MY_DEST_MAC1	0x11
-#define MY_DEST_MAC2	0x22
-#define MY_DEST_MAC3	0x33
-#define MY_DEST_MAC4	0x44
-#define MY_DEST_MAC5	0x55
+#define DEST_MAC0	0x00
+#define DEST_MAC1	0x11
+#define DEST_MAC2	0x22
+#define DEST_MAC3	0x33
+#define DEST_MAC4	0x44
+#define DEST_MAC5	0x55
 
 #define DEFAULT_IF	"lo"
 #define BUF_SIZ		1024
@@ -40,9 +40,9 @@ protected:
     };
 
 public:
-    bitPackTrans_t * sendTrans;
+    bitPackTrans_t *sendTrans;
     void getData();
-    int setUpEth();
+    int setUpEth(uint8_t data[], size_t size);
     
 
 };

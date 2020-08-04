@@ -109,7 +109,7 @@ void Transfer::display(uint8_t *data)
 */
 
 // function override, not template
-void Transfer::sendForPack(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
+void Transfer::packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
 {
 
     CPstruct->dataDirection = iterator.dataDirection;
@@ -133,15 +133,19 @@ void Transfer::sendForPack(uint8_t data[], memory_data &iterator, bitPackCP_t *C
     CPstruct->ef = iterator.ef;
     CPstruct->beamId = iterator.beamId;
 
-
-
-    passThroughEncode(data, sizeof(bitPackCP_t));
-
 }
 
-void Transfer::passThroughEncode(uint8_t data[], size_t size)
+int Transfer::passThroughEncode(uint8_t data[], size_t size)
 {
+
     useEnc.encodeData(data, size);
+
+    if (useTransport.setUpEth(data, size) == 1)
+    {
+        return(RETURN_FAILURE);
+    }
+
+    return(0);
 }
 
 /*

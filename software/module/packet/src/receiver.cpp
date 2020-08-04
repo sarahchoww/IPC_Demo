@@ -70,9 +70,11 @@ int Receiver::run(memory_data &iterator, uint8_t data[])
 
 
 
-        passThroughEncode(data, sizeof(bitPackCP_t)); // Decode it
+        if (passThroughEncode(data, sizeof(bitPackCP_t)) == 1)
+        {
+            return(RETURN_FAILURE);
+        } 
 
-        //display(data);
 
 
         if ((sem_post(semReceived)) == -1) // Notify data has been received

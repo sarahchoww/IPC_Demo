@@ -1,6 +1,7 @@
 #pragma once
 #include <config/struct.hpp>
 #include <encDec/encode.hpp>
+#include <eth/ecpri.hpp>
 
 // Interface for sender and receiver
 #include <iostream>
@@ -44,6 +45,7 @@ protected:
     //bitPackUP_t *UPstruct = (struct bitPackUP *) data; // Access UP data but point to data
 
     Encode useEnc;
+    Transport useTransport;
 
 public: 
 
@@ -57,9 +59,9 @@ public:
     void cleanUpMap(uint8_t data[]);
     void cleanUpFiles(memory_data &iterator);
 
-    void sendForPack(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
+    void packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
     //void sendForPack(bitPackUP_t *&sendBit, memory_data &iterator);
 
-    void passThroughEncode(uint8_t data[], size_t size);
+    int passThroughEncode(uint8_t data[], size_t size);
 
 };

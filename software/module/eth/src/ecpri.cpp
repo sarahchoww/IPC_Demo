@@ -10,8 +10,11 @@ void Transport::getData()
 
 }
 
-int Transport::setUpEth()
+int Transport::setUpEth(uint8_t data[], size_t size)
 {
+
+
+
     int socketFileDir;
 	struct ifreq interfaceIndex; // Interface index
 	struct ifreq MACInterface; // MAC interface
@@ -26,6 +29,7 @@ int Transport::setUpEth()
 	if ((socketFileDir = socket(AF_PACKET, SOCK_RAW, 0)) == -1) 
     {
 	    std::cout << "socket opening error\n";
+		perror("socket");
         return(1);
 	}
 
@@ -56,6 +60,29 @@ int Transport::setUpEth()
         std::cout << "IOCTL error\n";
         return(1);
     }
+
+
+	/* Index of the network device */
+	socketAddr.sll_ifindex = interfaceIndex.ifr_ifindex;
+	/* Address length*/
+	socketAddr.sll_halen = ETH_ALEN;
+	/* Destination MAC */
+	socketAddr.sll_addr[0] = DEST_MAC0;
+	socketAddr.sll_addr[1] = DEST_MAC1;
+	socketAddr.sll_addr[2] = DEST_MAC2;
+	socketAddr.sll_addr[3] = DEST_MAC3;
+	socketAddr.sll_addr[4] = DEST_MAC4;
+	socketAddr.sll_addr[5] = DEST_MAC5;
+
+		std::cout << "here\n";
+
+    
+    if (sendto(socketFileDir, data, size, 0, (struct sockaddr*)&socketAddr, sizeof(struct sockaddr_ll)) < 0)
+    {
+        std::cout << "sendto error\n";
+        return (1);
+    }
+
 
 
     return(0);
