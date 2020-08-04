@@ -13,7 +13,7 @@ void Transport::getData()
 int Transport::setUpEth()
 {
     int socketFileDir;
-	struct ifreq interfaceIndex // Interface index
+	struct ifreq interfaceIndex; // Interface index
 	struct ifreq MACInterface; // MAC interface
 
 	struct sockaddr_ll socketAddr;
