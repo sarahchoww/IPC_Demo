@@ -12,6 +12,8 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
 
     setToZero();
 
+
+
     // Convert argv[1] to a string by copying it
     std::string inputType1(argv[1]);
     bool idFail;
@@ -43,8 +45,18 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
         printf("AFTER: Address: %p\tValue:  %p\n", &data, data );
 
 
-        bitPackCP_t *CPstruct = (struct bitPackCP *) data;
-        bitPackUP_t *UPstruct = (struct bitPackUP *) data; // Access UP data but point to data
+        
+
+        if (useTransport.setUpEth(data) == 1)
+        {
+            std::cout << "set up eth error\n";
+            return(1);
+        }
+
+        size = sizeof(data);
+
+        bitPackCP_t *CPstruct = (struct bitPackCP *) (size + data);
+        bitPackUP_t *UPstruct = (struct bitPackUP *) (size + data); // Access UP data but point to data
 
         //std::cout << "\npoointer 1\t" << CPstruct << "\npointer 2\t" << UPstruct << "\npointer 3\t" << data << std::endl;
         printf("pointer1: %p\t pointer2:  %p\t pointer 3: %p\n", CPstruct, UPstruct, data );

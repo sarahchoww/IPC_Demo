@@ -6,6 +6,7 @@
 #include <packet/receiver.hpp>
 #include <packet/sender.hpp>
 #include <config/struct.hpp>
+#include <eth/ecpri.hpp>
 
 #define RETURN_FAILURE 1
 #define RETURN_TIMEDOUT 2
@@ -32,6 +33,9 @@ protected:
     configVars cVar;
     memory_data iterator;
     libconfig::Config cfg;
+
+    Transport useTransport;
+    size_t size;
 
 
 public:

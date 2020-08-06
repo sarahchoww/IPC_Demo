@@ -62,6 +62,6 @@ public:
     void packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
     //void sendForPack(bitPackUP_t *&sendBit, memory_data &iterator);
 
-    int passThroughEncode(uint8_t data[], size_t size);
+    int passThroughEncode(uint8_t data[]);
 
 };

@@ -10,27 +10,17 @@ void Transport::getData()
 
 }
 
-int Transport::setUpEth(uint8_t data[], size_t size)
-{
-
-
-
-    int socketFileDir;
-	struct ifreq interfaceIndex; // Interface index
-	struct ifreq MACInterface; // MAC interface
-
-	struct sockaddr_ll socketAddr;
-
-	char interfaceName[IFNAMSIZ] = DEFAULT_IF;
-    // IFNAMSIZ is the maxomum buffer size needed to hold an interface name including the terminating 0
-	
+int Transport::setUpEth(uint8_t *&data)
+{	
+	eh = (struct ether_header *) data;
+	ip = (struct iphdr *) (data + sizeof(struct ether_header));
 
 	/* Open RAW socket to send on */
 	if ((socketFileDir = socket(AF_PACKET, SOCK_RAW, 0)) == -1) 
     {
 	    std::cout << "socket opening error\n";
 		perror("socket");
-        return(1);
+        return(-1);
 	}
 
 
@@ -40,12 +30,12 @@ int Transport::setUpEth(uint8_t data[], size_t size)
 	strncpy(interfaceIndex.ifr_name, interfaceName, IFNAMSIZ-1); 
     // Copies interfaceName to interfaceIndex struct, size of max buffer size minus the terminating 0
 
-    // Manipulates underlying device parameters of special files ????, typically to control the termincal
+    // Manipulates underlying device parameters of special files ????, typically to control the terminal
     // SIOGCGIFINDEX gets the index of the interface into socketFileDir
     if (ioctl(socketFileDir, SIOCGIFINDEX, &interfaceIndex) < 0)
     {
         std::cout << "IOCTL error\n";
-        return(1);
+        return(-1);
     }
 
 
@@ -58,9 +48,45 @@ int Transport::setUpEth(uint8_t data[], size_t size)
 	if (ioctl(socketFileDir, SIOCGIFHWADDR, &MACInterface) < 0)
 	{
         std::cout << "IOCTL error\n";
-        return(1);
+        return(-1);
     }
 
+
+  struct sockaddr_in saddr, daddr; // IP source and destination 
+
+  ip->ihl      = 5; //header length, number of 32-bit words 
+  ip->version  = 4;
+  ip->tos      = 0x0;
+  ip->id       = 0;
+  ip->frag_off = htons(0x4000); // Don't fragment 
+  ip->ttl      = 64;
+  ip->tot_len  = htons(sizeof(struct iphdr) + 0);
+  ip->protocol = IPPROTO_UDP;
+  ip->saddr    = saddr.sin_addr.s_addr;
+  ip->daddr    = daddr.sin_addr.s_addr;
+
+
+
+	eh->ether_shost[0] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[0];
+	eh->ether_shost[1] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[1];
+	eh->ether_shost[2] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[2];
+	eh->ether_shost[3] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[3];
+	eh->ether_shost[4] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[4];
+	eh->ether_shost[5] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[5];
+	eh->ether_dhost[0] = DEST_MAC0;
+	eh->ether_dhost[1] = DEST_MAC1;
+	eh->ether_dhost[2] = DEST_MAC2;
+	eh->ether_dhost[3] = DEST_MAC3;
+	eh->ether_dhost[4] = DEST_MAC4;
+	eh->ether_dhost[5] = DEST_MAC5;
+	// Ethertype field 
+	eh->ether_type = htons(ETH_P_IP);
+
+    return(0);
+}
+
+int Transport::sendEth(uint8_t data[], size_t totalSize)
+{
 
 	/* Index of the network device */
 	socketAddr.sll_ifindex = interfaceIndex.ifr_ifindex;
@@ -74,16 +100,25 @@ int Transport::setUpEth(uint8_t data[], size_t size)
 	socketAddr.sll_addr[4] = DEST_MAC4;
 	socketAddr.sll_addr[5] = DEST_MAC5;
 
-		std::cout << "here\n";
+	
+	//int result = sendto(socketFileDir, data, size, 0, 0, 0);
 
-    
-    if (sendto(socketFileDir, data, size, 0, (struct sockaddr*)&socketAddr, sizeof(struct sockaddr_ll)) < 0)
+    //if (result < 0)
+	    //if (sendto(socketFileDir, data, size, 0, (struct sockaddr*)&socketAddr, sizeof(struct sockaddr_ll)) < 0)
+
+	std::cout << "size\t" << totalSize << std::endl;
+
+	if (sendto(socketFileDir, data, totalSize, 0, (struct sockaddr*)&socketAddr, sizeof(struct sockaddr_ll)) < 0)
     {
-        std::cout << "sendto error\n";
+        std::cout << "sendto error\n" << std::endl;
         return (1);
     }
+	/*
+	else
+	{
+		std::cout << "characters sent\t" << result << std::endl;
+	}
+	*/
 
-
-
-    return(0);
+	return(0);
 }

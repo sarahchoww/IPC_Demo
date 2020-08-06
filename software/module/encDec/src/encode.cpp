@@ -1,10 +1,10 @@
 #include <encDec/encode.hpp>
 
-void Encode::encodeData(uint8_t data[], size_t size)
+void Encode::encodeData(uint8_t data[], size_t sizeData, size_t sizeBitPack)
 {
     uint8_t x;
 
-    for (size_t newSize = 0; newSize < size; newSize++)
+    for (size_t newSize = sizeData; newSize < sizeBitPack; newSize++)
     {   
         x = data[newSize];   
         

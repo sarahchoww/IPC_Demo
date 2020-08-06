@@ -70,7 +70,7 @@ int Receiver::run(memory_data &iterator, uint8_t data[])
 
 
 
-        if (passThroughEncode(data, sizeof(bitPackCP_t)) == 1)
+        if (passThroughEncode(data) == 1)
         {
             return(RETURN_FAILURE);
         } 

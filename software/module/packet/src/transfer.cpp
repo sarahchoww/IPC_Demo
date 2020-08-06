@@ -135,12 +135,12 @@ void Transfer::packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstru
 
 }
 
-int Transfer::passThroughEncode(uint8_t data[], size_t size)
+int Transfer::passThroughEncode(uint8_t data[])
 {
 
-    useEnc.encodeData(data, size);
+    useEnc.encodeData(data, sizeof(data), sizeof(bitPackCP_t));
 
-    if (useTransport.setUpEth(data, size) == 1)
+    if (useTransport.sendEth(data, sizeof(data)) == 1)
     {
         return(RETURN_FAILURE);
     }
