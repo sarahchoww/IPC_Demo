@@ -34,8 +34,6 @@ protected:
     memory_data iterator;
     libconfig::Config cfg;
 
-    Transport useTransport;
-    size_t size;
 
 
 public:

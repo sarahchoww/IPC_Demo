@@ -116,11 +116,12 @@ std::cout << "\nbeamid: " << iterator.beamId << "\n\n";
 
 
                     useTransfer->packCP(data, iterator, CPstruct, UPstruct);
+
                     if ((useTransfer->passThroughEncode(data)) == RETURN_FAILURE)
                     {
                         return (RETURN_FAILURE);
                     }
-                    
+
 
                     // Pack after display output so data isn't skewed, this will be removed later
                 }

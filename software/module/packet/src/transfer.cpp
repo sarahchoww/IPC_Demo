@@ -1,5 +1,5 @@
 #include <packet/transfer.hpp>
-#include <vector>
+
 
 const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operation)
 {
@@ -138,7 +138,25 @@ void Transfer::packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstru
 int Transfer::passThroughEncode(uint8_t data[])
 {
 
-    useEnc.encodeData(data, sizeof(data), sizeof(bitPackCP_t));
+    int result;
+
+
+
+    useEnc.encodeData(data, sizeof(data));
+
+    //result = useTransport.setUpEth(data);
+/*
+    if (result == -1)
+    {
+        std::cout << "set up eth error\n";
+        return(1);
+    }
+*/
+
+
+    std::cout << "Size\t" << std::dec << &data<< std::endl;
+
+    std::cout << "Size\t" << (&data) + 1 << std::endl;
 
     if (useTransport.sendEth(data, sizeof(data)) == 1)
     {

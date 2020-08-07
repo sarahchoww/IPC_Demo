@@ -45,20 +45,13 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
         printf("AFTER: Address: %p\tValue:  %p\n", &data, data );
 
 
-        
+        size_t sizeHeader = sizeof(struct ether_header) + sizeof(struct iphdr);
 
-        if (useTransport.setUpEth(data) == 1)
-        {
-            std::cout << "set up eth error\n";
-            return(1);
-        }
 
-        size = sizeof(data);
+        bitPackCP_t *CPstruct = (struct bitPackCP *) (data + sizeHeader); // Write to data, offset by sizeHeader
 
-        bitPackCP_t *CPstruct = (struct bitPackCP *) (size + data);
-        bitPackUP_t *UPstruct = (struct bitPackUP *) (size + data); // Access UP data but point to data
+        bitPackUP_t *UPstruct = (struct bitPackUP *) (data + sizeHeader); 
 
-        //std::cout << "\npoointer 1\t" << CPstruct << "\npointer 2\t" << UPstruct << "\npointer 3\t" << data << std::endl;
         printf("pointer1: %p\t pointer2:  %p\t pointer 3: %p\n", CPstruct, UPstruct, data );
 
 

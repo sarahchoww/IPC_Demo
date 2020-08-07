@@ -41,20 +41,12 @@ protected:
     };
 
 
-    int socketFileDir;
-	struct ifreq interfaceIndex; // Interface index
-	struct ifreq MACInterface; // MAC interface
-
-	struct ether_header *eh;
-	struct iphdr *ip;
-	char interfaceName[IFNAMSIZ] = DEFAULT_IF;
-	struct sockaddr_ll socketAddr;
 
 
 public:
     bitPackTrans_t *sendTrans;
     void getData();
-    int setUpEth(uint8_t *&data);
+    int setUpEth(uint8_t data[]);
     int sendEth(uint8_t data[], size_t size);
     
 
