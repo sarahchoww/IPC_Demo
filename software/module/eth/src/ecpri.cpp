@@ -101,7 +101,9 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 
 
 	struct ether_header *eh = (struct ether_header *) data;
-	//struct iphdr *ip = (struct iphdr *) (data + sizeof(struct ether_header));
+	struct iphdr *ip = (struct iphdr *) (data + sizeof(struct ether_header));
+
+	size_t sizeTotal = sizeStruct + sizeof(struct ether_header) + sizeof(struct iphdr);
 
 
 	/* Open RAW socket to send on */
@@ -140,7 +142,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
         return(-1);
     }
 
-/*
+
   struct sockaddr_in saddr, daddr; // IP source and destination 
 
   ip->ihl      = 5; //header length, number of 32-bit words 
@@ -154,7 +156,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
   ip->saddr    = saddr.sin_addr.s_addr;
   ip->daddr    = daddr.sin_addr.s_addr;
 
-*/
+
 
 	eh->ether_shost[0] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[0];
 	eh->ether_shost[1] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[1];
@@ -192,7 +194,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	    //if (sendto(socketFileDir, data, size, 0, (struct sockaddr*)&socketAddr, sizeof(struct sockaddr_ll)) < 0)
 
 
-	if (sendto(socketFileDir, data, sizeStruct, 0, (struct sockaddr*)&socketAddr, sizeof(struct sockaddr_ll)) < 0)
+	if (sendto(socketFileDir, data, sizeTotal, 0, (struct sockaddr*)&socketAddr, sizeof(struct sockaddr_ll)) < 0)
     {
         std::cout << "sendto error\n" << std::endl;
         return (1);

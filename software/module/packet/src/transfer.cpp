@@ -138,11 +138,11 @@ void Transfer::packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstru
 int Transfer::passThroughEncode(uint8_t data[])
 {
 
-    int result;
 
 
+    size_t sizeHeader = sizeof(struct ether_header) + sizeof(struct iphdr);
 
-    useEnc.encodeData(data, sizeof(data));
+    useEnc.encodeData(data, sizeof(bitPackCP_t) + sizeHeader);
 
     //result = useTransport.setUpEth(data);
 /*
@@ -154,11 +154,9 @@ int Transfer::passThroughEncode(uint8_t data[])
 */
 
 
-    std::cout << "Size\t" << std::dec << &data<< std::endl;
 
-    std::cout << "Size\t" << (&data) + 1 << std::endl;
 
-    if (useTransport.sendEth(data, sizeof(data)) == 1)
+    if (useTransport.sendEth(data, sizeof(bitPackCP_t)) == 1)
     {
         return(RETURN_FAILURE);
     }
