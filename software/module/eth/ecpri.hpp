@@ -25,6 +25,31 @@
 
 
 
+struct ecpri_header
+{
+
+    #if defined(__LITTLE_ENDIAN_BITFIELD)
+    __u8	ihl:4,
+        version:4;
+    #elif defined (__BIG_ENDIAN_BITFIELD)
+    __u8	version:4,
+        ihl:4;
+    #else
+    #error	"Please fix <asm/byteorder.h>"
+    #endif
+    __u8	tos; // Type of service
+    __be16	tot_len; // Total length
+    __be16	id;
+    __be16	frag_off; // Fragmentation
+    __u8	ttl; // Time to live - 64?
+    __u8	protocol; // 17?
+    __sum16	check; // Checking - optional?
+    __be32	saddr; // Source address
+    __be32	daddr; // Destination address
+    /*The options start here. */
+
+};
+
 
 class Transport
 {
@@ -48,6 +73,6 @@ public:
     void getData(size_t totalSize);
     int setUpEth(uint8_t data[]);
     int sendEth(uint8_t data[], size_t size);
-    
+
 
 };

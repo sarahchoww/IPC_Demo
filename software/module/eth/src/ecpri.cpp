@@ -4,7 +4,7 @@ void Transport::getData(size_t totalSize)
 {	
     struct transConfig ecpriVars;
 
-    ecpriVars.ecpriVersion = 1; // Version 1
+    ecpriVars.ecpriVersion = 1; // Version 1]
     ecpriVars.ecpriMessage = 0; // IQ data type
     ecpriVars.ecpriConcatenation = 0; // No concatenation
     ecpriVars.ecpriPayload = totalSize; // Size of payload
@@ -26,9 +26,13 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 
 
 	struct ether_header *eh = (struct ether_header *) data;
-	struct iphdr *ip = (struct iphdr *) (data + sizeof(struct ether_header));
+	//struct iphdr *ip = (struct iphdr *) (data + sizeof(struct ether_header));
 
-	size_t totalSize = sizeStruct + sizeof(struct ether_header) + sizeof(struct iphdr);
+	struct ecpri_header *ecpri = (struct ecpri_header *) data;
+
+
+
+	size_t totalSize = sizeStruct + sizeof(struct ether_header) + sizeof(struct ecpri_header);
 
 
 	/* Open RAW socket to send on */
@@ -67,7 +71,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
         return(-1);
     }
 
-
+/*
   struct sockaddr_in saddr, daddr; // IP source and destination 
 
   ip->ihl      = 5; //header length, number of 32-bit words 
@@ -81,7 +85,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
   ip->saddr    = saddr.sin_addr.s_addr;
   ip->daddr    = daddr.sin_addr.s_addr;
 
-
+*/
 
 	eh->ether_shost[0] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[0];
 	eh->ether_shost[1] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[1];

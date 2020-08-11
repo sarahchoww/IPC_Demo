@@ -45,7 +45,8 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
         printf("AFTER: Address: %p\tValue:  %p\n", &data, data );
 
 
-        size_t sizeHeader = sizeof(struct ether_header) + sizeof(struct iphdr);
+
+        size_t sizeHeader = sizeof(struct ether_header) + sizeof(struct ecpri_header);
 
 
         bitPackCP_t *CPstruct = (struct bitPackCP *) (data + sizeHeader); // Write to data, offset by sizeHeader
