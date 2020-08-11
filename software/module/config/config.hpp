@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include <libconfig.h++>
-#include <bitset>
 
 #include <packet/receiver.hpp>
 #include <packet/sender.hpp>

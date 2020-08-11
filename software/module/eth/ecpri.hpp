@@ -12,6 +12,8 @@
 #include <netinet/ether.h>
 
 #include <linux/ip.h>
+#include <netinet/in.h>
+
 
 #define DEST_MAC0	0x11
 #define DEST_MAC1	0x22
@@ -21,7 +23,8 @@
 #define DEST_MAC5	0x66
 
 #define DEFAULT_IF	"lo"
-#define BUF_SIZ		1024
+#define BUF_SIZ		1500
+#define PORT        8080
 
 
 
@@ -46,8 +49,7 @@ protected:
 public:
     bitPackTrans_t *sendTrans;
     void getData();
-    int setUpEth(uint8_t data[]);
-    int sendEth(uint8_t data[], size_t size);
+    int sendEth(uint8_t data[], size_t sizeStruct);
     
 
 };
