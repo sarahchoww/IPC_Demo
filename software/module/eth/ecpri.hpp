@@ -45,7 +45,7 @@ protected:
 
 public:
     bitPackTrans_t *sendTrans;
-    void getData();
+    void getData(size_t totalSize);
     int setUpEth(uint8_t data[]);
     int sendEth(uint8_t data[], size_t size);
     
