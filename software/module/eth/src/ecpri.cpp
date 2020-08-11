@@ -1,11 +1,13 @@
 #include <eth/ecpri.hpp>
 
 void Transport::getData(size_t totalSize)
-{
-    sendTrans->ecpriVersion = 1; // Version 1
-    sendTrans->ecpriMessage = 0; // IQ data type
-    sendTrans->ecpriConcatenation = 0; // No concatenation
-    sendTrans->ecpriPayload = totalSize; // Size of payload
+{	
+    struct transConfig ecpriVars;
+
+    ecpriVars.ecpriVersion = 1; // Version 1
+    ecpriVars.ecpriMessage = 0; // IQ data type
+    ecpriVars.ecpriConcatenation = 0; // No concatenation
+    ecpriVars.ecpriPayload = totalSize; // Size of payload
 
 
 }
