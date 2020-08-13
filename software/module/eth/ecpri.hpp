@@ -12,6 +12,8 @@
 #include <netinet/ether.h>
 
 #include <linux/ip.h>
+#include <linux/types.h>
+#include <asm/byteorder.h>
 
 #define DEST_MAC0	0x11
 #define DEST_MAC1	0x22
@@ -24,31 +26,21 @@
 #define BUF_SIZ		1024
 
 
-
+#pragma pack(push, 1)
 struct ecpri_header
 {
 
-    #if defined(__LITTLE_ENDIAN_BITFIELD)
-    __u8	ihl:4,
-        version:4;
-    #elif defined (__BIG_ENDIAN_BITFIELD)
-    __u8	version:4,
-        ihl:4;
-    #else
-    #error	"Please fix <asm/byteorder.h>"
-    #endif
-    __u8	tos; // Type of service
-    __be16	tot_len; // Total length
-    __be16	id;
-    __be16	frag_off; // Fragmentation
-    __u8	ttl; // Time to live - 64?
-    __u8	protocol; // 17?
-    __sum16	check; // Checking - optional?
-    __be32	saddr; // Source address
-    __be32	daddr; // Destination address
-    /*The options start here. */
+
+    __u8	proto_rev: 4,
+        reserved: 3,
+        concatenate: 1;
+
+
+    __u8 message_type; // unsigned char 8 bits
+    __be16 payload_size; // be16 - big endian 16 bits, bitwise attributes
 
 };
+#pragma pack(pop)
 
 
 class Transport
@@ -70,7 +62,6 @@ protected:
 
 public:
     bitPackTrans_t *sendTrans;
-    void getData(size_t totalSize);
     int setUpEth(uint8_t data[]);
     int sendEth(uint8_t data[], size_t size);
 

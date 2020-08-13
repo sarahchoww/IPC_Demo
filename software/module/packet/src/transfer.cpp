@@ -140,7 +140,7 @@ int Transfer::passThroughEncode(uint8_t data[])
 
 
 
-    size_t sizeHeader = sizeof(struct ether_header) + sizeof(struct iphdr);
+    size_t sizeHeader = sizeof(struct ether_header);
 
     useEnc.encodeData(data, sizeof(bitPackCP_t) + sizeHeader);
 

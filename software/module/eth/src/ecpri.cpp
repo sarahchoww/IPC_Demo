@@ -1,17 +1,5 @@
 #include <eth/ecpri.hpp>
 
-void Transport::getData(size_t totalSize)
-{	
-    struct transConfig ecpriVars;
-
-    ecpriVars.ecpriVersion = 1; // Version 1]
-    ecpriVars.ecpriMessage = 0; // IQ data type
-    ecpriVars.ecpriConcatenation = 0; // No concatenation
-    ecpriVars.ecpriPayload = totalSize; // Size of payload
-
-
-}
-
 
 int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 {
@@ -21,6 +9,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	struct ifreq MACInterface; // MAC interface
 
 
+
 	char interfaceName[IFNAMSIZ] = DEFAULT_IF;
 	struct sockaddr_ll socketAddr;
 
@@ -28,7 +17,9 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	struct ether_header *eh = (struct ether_header *) data;
 	//struct iphdr *ip = (struct iphdr *) (data + sizeof(struct ether_header));
 
-	struct ecpri_header *ecpri = (struct ecpri_header *) data;
+	struct ecpri_header *ecpri = (struct ecpri_header *) (data + sizeof(ether_header));
+
+
 
 
 
@@ -44,7 +35,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	}
 
 
-	/* Get the index of the interface to send on */
+
 	memset(&interfaceIndex, 0, sizeof(struct ifreq)); // Sets value of interfaceIndex to 0 the size of ifreq
 
 	strncpy(interfaceIndex.ifr_name, interfaceName, IFNAMSIZ-1); 
@@ -87,6 +78,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 
 */
 
+
 	eh->ether_shost[0] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[0];
 	eh->ether_shost[1] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[1];
 	eh->ether_shost[2] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[2];
@@ -100,7 +92,26 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	eh->ether_dhost[4] = DEST_MAC4;
 	eh->ether_dhost[5] = DEST_MAC5;
 	// Ethertype field 
-	eh->ether_type = htons(ETH_P_IP);
+	eh->ether_type = htons(0xaefe);
+
+
+
+	
+
+
+
+
+	ecpri->proto_rev = 1;
+
+	ecpri->concatenate = 0;
+	ecpri->message_type = 0; // IQ data type
+	ecpri->payload_size = htonl(sizeStruct);
+
+	if (ioctl(socketFileDir, 0xaefe, &ecpri) < 0)
+    {
+        std::cout << "IOCTL error\n";
+        return(-1);
+    }
 
 
 
@@ -116,13 +127,6 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	socketAddr.sll_addr[4] = DEST_MAC4;
 	socketAddr.sll_addr[5] = DEST_MAC5;
 
-	getData(totalSize);
-
-	
-	//int result = sendto(socketFileDir, data, size, 0, 0, 0);
-
-    //if (result < 0)
-	    //if (sendto(socketFileDir, data, size, 0, (struct sockaddr*)&socketAddr, sizeof(struct sockaddr_ll)) < 0)
 
 
 	if (sendto(socketFileDir, data, totalSize, 0, (struct sockaddr*)&socketAddr, sizeof(struct sockaddr_ll)) < 0)
@@ -130,12 +134,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
         std::cout << "sendto error\n" << std::endl;
         return (1);
     }
-	/*
-	else
-	{
-		std::cout << "characters sent\t" << result << std::endl;
-	}
-	*/
+
 
 	return(0);
 }
