@@ -154,6 +154,7 @@ int Transfer::passThroughEncode(uint8_t data[])
 */
 
 
+    // if concatenation, need to separate it out and make two calls to sendEth
 
 
     if (useTransport.sendEth(data, sizeof(bitPackCP_t)) == 1)

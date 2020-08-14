@@ -31,13 +31,14 @@ struct ecpri_header
 {
 
 
-    __u8	proto_rev: 4,
+    __u8    concatenate: 1,
         reserved: 3,
-        concatenate: 1;
-
+        proto_rev: 4;
 
     __u8 message_type; // unsigned char 8 bits
     __be16 payload_size; // be16 - big endian 16 bits, bitwise attributes
+    __be16 rtcid_pcid; // Real time control data / IQ data transfer message series identifier
+    __be16 seqid; // Sequence ID
 
 };
 #pragma pack(pop)

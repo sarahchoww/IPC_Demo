@@ -19,7 +19,7 @@ run_ru:
 
 clean:
 	rm -rf bin/obj
-	cd bin; rm sim
+	cd bin; rm sim*
 
 # Main
 bin/obj/main.o: module/main/src/main.cpp module/config/config.hpp

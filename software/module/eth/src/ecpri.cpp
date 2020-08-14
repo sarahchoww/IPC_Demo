@@ -8,8 +8,6 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	struct ifreq interfaceIndex; // Interface index
 	struct ifreq MACInterface; // MAC interface
 
-
-
 	char interfaceName[IFNAMSIZ] = DEFAULT_IF;
 	struct sockaddr_ll socketAddr;
 
@@ -18,10 +16,6 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	//struct iphdr *ip = (struct iphdr *) (data + sizeof(struct ether_header));
 
 	struct ecpri_header *ecpri = (struct ecpri_header *) (data + sizeof(ether_header));
-
-
-
-
 
 	size_t totalSize = sizeStruct + sizeof(struct ether_header) + sizeof(struct ecpri_header);
 
@@ -62,21 +56,6 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
         return(-1);
     }
 
-/*
-  struct sockaddr_in saddr, daddr; // IP source and destination 
-
-  ip->ihl      = 5; //header length, number of 32-bit words 
-  ip->version  = 4;
-  ip->tos      = 0x0;
-  ip->id       = 0;
-  ip->frag_off = htons(0x4000); // Don't fragment 
-  ip->ttl      = 64;
-  ip->tot_len  = htons(sizeof(struct iphdr) + 0);
-  ip->protocol = IPPROTO_UDP;
-  ip->saddr    = saddr.sin_addr.s_addr;
-  ip->daddr    = daddr.sin_addr.s_addr;
-
-*/
 
 
 	eh->ether_shost[0] = ((uint8_t *)&MACInterface.ifr_hwaddr.sa_data)[0];
@@ -95,24 +74,14 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	eh->ether_type = htons(0xaefe);
 
 
-
-	
-
-
-
-
 	ecpri->proto_rev = 1;
-
+	ecpri->reserved = 0;
 	ecpri->concatenate = 0;
 	ecpri->message_type = 0; // IQ data type
-	ecpri->payload_size = htonl(sizeStruct);
-
-	if (ioctl(socketFileDir, 0xaefe, &ecpri) < 0)
-    {
-        std::cout << "IOCTL error\n";
-        return(-1);
-    }
-
+	ecpri->payload_size = htons(sizeStruct);
+	ecpri->rtcid_pcid = 1;
+	ecpri->seqid = 1;
+	
 
 
 	/* Index of the network device */
