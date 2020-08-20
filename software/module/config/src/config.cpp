@@ -48,8 +48,14 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
 
         size_t sizeHeader = sizeof(struct ether_header) + sizeof(struct ecpri_header);
 
+        //std::cout << "size\t" << sizeHeader << "\n";
+
 
         bitPackCP_t *CPstruct = (struct bitPackCP *) (data + sizeHeader); // Write to data, offset by sizeHeader
+
+        CPstruct->dataDirection = 1;
+
+        std::cout << "after config\n";
 
         bitPackUP_t *UPstruct = (struct bitPackUP *) (data + sizeHeader); 
 

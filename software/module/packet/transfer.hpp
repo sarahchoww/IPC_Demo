@@ -14,6 +14,8 @@
 #include <signal.h> // For ctrl-c
 #include <cstring>
 
+#include <linux/if_ether.h> // socket
+#include <sys/socket.h> // socket
 
 #define RETURN_FAILURE 1
 #define RETURN_TIMEDOUT 2
@@ -22,6 +24,8 @@
 #define FILENAME "/testSHM"
 #define FILEPATH "/dev/shm/sem."
 #define ARR_SIZE 6
+
+
 
 class Transfer
 {
@@ -51,17 +55,19 @@ public:
 
     virtual ~Transfer() = default;
 
-    int setUp(int idValue);
+    int setUp(int idValue, uint8_t **data);
     virtual int run(memory_data &iterator, uint8_t data[]) = 0;
     void display(uint8_t *data);
 
     const char * arrangeFiles(std::string fileToArrange, int id, int operation);
     void cleanUpMap(uint8_t data[]);
-    void cleanUpFiles(memory_data &iterator);
+    void cleanUpFiles(memory_data &iterator, uint8_t **data);
 
     void packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
     //void sendForPack(bitPackUP_t *&sendBit, memory_data &iterator);
 
     int passThroughEncode(uint8_t data[]);
+    int passThroughEth(uint8_t data[]);
+
 
 };

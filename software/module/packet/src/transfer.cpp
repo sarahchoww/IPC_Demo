@@ -1,6 +1,5 @@
 #include <packet/transfer.hpp>
 
-
 const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operation)
 {
     // Rearrange / append characters and put into const char *
@@ -44,11 +43,13 @@ const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operat
     return NULL;
 }
 
-int Transfer::setUp(int idValue)
+int Transfer::setUp(int idValue, uint8_t **data)
 {
-    semNewDataFile = arrangeFiles(SEM_NEWDATA, idValue, 1);
-    semReceivedFile = arrangeFiles(SEM_RECEIVED, idValue, 1);
-    fileID = arrangeFiles(FILENAME, idValue, 1);
+    //semNewDataFile = arrangeFiles(SEM_NEWDATA, idValue, 1);
+    //semReceivedFile = arrangeFiles(SEM_RECEIVED, idValue, 1);
+    //fileID = arrangeFiles(FILENAME, idValue, 1);
+
+    /*
 
     if ((semNewData = sem_open(semNewDataFile, O_CREAT, 0600, 0)) == SEM_FAILED)
     {
@@ -62,20 +63,37 @@ int Transfer::setUp(int idValue)
         return (RETURN_FAILURE);
     }
 
+
+
     if ((fileDir = shm_open(fileID, O_CREAT | O_RDWR, 0600)) == -1) // Open and create a file if it does not already exist
     {
         std::cout << "file opening error\n";
         return (RETURN_FAILURE);
     }
 
-    if ((ftruncate(fileDir, sizeof(bitPackCP_t) + sizeof(bitPackUP_t))) == -1)
+    if ((ftruncate(fileDir, sizeof(struct ether_header) + sizeof(struct ecpri_header) + sizeof(bitPackCP_t) + sizeof(bitPackUP_t))) == -1)
     {
         std::cout << "truncate fail\n";
         return (RETURN_FAILURE);
     }
 
+*/
+
+
+    printf("mmap1: Address: %p\tValue:  %p\n", &(*data), *data);
+
+    if ((*data = (uint8_t *)malloc(sizeof(struct ether_header) + sizeof(struct ecpri_header) + sizeof(bitPackCP_t) + sizeof(bitPackUP_t))) == NULL)
+    {
+        std::cout << "malloc failed\n";
+        return (RETURN_FAILURE);
+    }
+
+    //std::cout << "mmap 2\t" << &(*data) << "\tvalue\t" << *data << std::endl;
+    printf("mmap2: Address: %p\tValue:  %p\n", &(*data), *data);
+
     return (0);
 }
+
 
 void Transfer::cleanUpMap(uint8_t data[])
 {
@@ -83,18 +101,22 @@ void Transfer::cleanUpMap(uint8_t data[])
     {
         std::cout << "munmap failed\n";
     }
-
 }
 
-void Transfer::cleanUpFiles(memory_data &iterator)
+void Transfer::cleanUpFiles(memory_data &iterator, uint8_t **data)
 {
-    shm_unlink(fileID);
 
-    sem_close(semNewData);
-    sem_close(semReceived);
+    delete *data;
 
-    arrangeFiles(semNewDataFile, (iterator.id), 2);
-    arrangeFiles(semReceivedFile, (iterator.id), 2);
+    useTransport.~Transport();
+
+    //shm_unlink(fileID);
+
+    //sem_close(semNewData);
+    //sem_close(semReceived);
+
+    //arrangeFiles(semNewDataFile, (iterator.id), 2);
+    //arrangeFiles(semReceivedFile, (iterator.id), 2);
 }
 
 /*
@@ -111,8 +133,9 @@ void Transfer::display(uint8_t *data)
 // function override, not template
 void Transfer::packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
 {
-
+std::cout << "here\n";
     CPstruct->dataDirection = iterator.dataDirection;
+std::cout << "here now\n";
     CPstruct->payloadVersion = iterator.payloadVersion;
     CPstruct->filterIndex = iterator.filterIndex;
     CPstruct->frameId = iterator.frameId;
@@ -138,32 +161,46 @@ void Transfer::packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstru
 int Transfer::passThroughEncode(uint8_t data[])
 {
 
+/*
+    // Make dummyIQ
+    int num;
 
+    for (int i = 0; i < 32; i++)
+    {
+
+        num = rand() % 100;
+
+        buf[i] = 0b00110000;
+
+        if ((num % 5) == 0) // Space
+        {
+            buf[i] = 0b00100000;
+        }
+
+        if (i % 5 == 0) // New line every 4th
+        {
+            buf[i] = 0b00001010;
+        }
+    }
+*/
 
     size_t sizeHeader = sizeof(struct ether_header);
 
     useEnc.encodeData(data, sizeof(bitPackCP_t) + sizeHeader);
 
-    //result = useTransport.setUpEth(data);
-/*
-    if (result == -1)
-    {
-        std::cout << "set up eth error\n";
-        return(1);
-    }
-*/
+    return (0);
+}
 
-
-    // if concatenation, need to separate it out and make two calls to sendEth
-
-
+int Transfer::passThroughEth(uint8_t data[])
+{
     if (useTransport.sendEth(data, sizeof(bitPackCP_t)) == 1)
     {
-        return(RETURN_FAILURE);
+        return (RETURN_FAILURE);
     }
-
+    
     return(0);
 }
+
 
 /*
 void Transfer::sendForPack(bitPackUP_t *&sendBitCP, memory_data &iterator)
@@ -192,4 +229,3 @@ void Transfer::sendForPack(bitPackUP_t *&sendBitCP, memory_data &iterator)
     useEnc.encodeData(data, sizeof(bitPackUP_t));
     */
 //}
-

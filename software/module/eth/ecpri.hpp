@@ -15,14 +15,20 @@
 #include <linux/types.h>
 #include <asm/byteorder.h>
 
-#define DEST_MAC0	0x11
-#define DEST_MAC1	0x22
-#define DEST_MAC2	0x33
-#define DEST_MAC3	0x44
-#define DEST_MAC4	0x55
-#define DEST_MAC5	0x66
+#include <unistd.h>
 
-#define DEFAULT_IF	"lo"
+
+#define DEST_MAC0	0xa4
+#define DEST_MAC1	0xbb
+#define DEST_MAC2	0x6d
+#define DEST_MAC3	0x47
+#define DEST_MAC4	0xe8
+#define DEST_MAC5	0x0c
+
+#define SENDER_IF	"lo"
+#define RECEIVER_IF "enp1s0"
+#define ETHER_TYPE 0x80ab /* custom type */
+
 #define BUF_SIZ		1024
 
 
@@ -57,6 +63,7 @@ protected:
         unsigned int ecpriRtcidPcid;
         unsigned int ecpriSeqid;
     };
+
 
 
 
