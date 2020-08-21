@@ -133,9 +133,7 @@ void Transfer::display(uint8_t *data)
 // function override, not template
 void Transfer::packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
 {
-std::cout << "here\n";
     CPstruct->dataDirection = iterator.dataDirection;
-std::cout << "here now\n";
     CPstruct->payloadVersion = iterator.payloadVersion;
     CPstruct->filterIndex = iterator.filterIndex;
     CPstruct->frameId = iterator.frameId;

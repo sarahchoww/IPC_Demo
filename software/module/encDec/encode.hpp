@@ -1,6 +1,5 @@
 #include <iostream>
-#include <stdint.h>
-#include <semaphore.h>
+#include <bitset>
 
 class Encode
 {

@@ -7,8 +7,7 @@ void Encode::encodeData(uint8_t data[], size_t sizeData)
     for (size_t newSize = 0; newSize < sizeData; newSize++)
     {   
         x = data[newSize];   
-        
-        printf("value1: %d\n", data[newSize]);
+
 
         x = (x >> 4) | (x << 4);
         x = ((x & 0xCC) >> 2) | ((x & 0x33) << 2);
@@ -16,8 +15,12 @@ void Encode::encodeData(uint8_t data[], size_t sizeData)
 
         data[newSize] = x;
 
-        printf("value2: %d\n", data[newSize]);
-        std::cout << std::endl;
+
+        std::string binary2 = std::bitset<8>(data[newSize]).to_string(); //to binary
+        std::cout << binary2 <<" ";
+
     }
+
+    std::cout << "\n\n";
     
 }
