@@ -70,8 +70,8 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	ecpri->concatenate = 0;
 	ecpri->message_type = 0; // IQ data type
 	ecpri->payload_size = htons(sizeStruct);
-	ecpri->rtcid_pcid = 1;
-	ecpri->seqid = 1;
+	ecpri->rtcid_pcid = htons(1);
+	ecpri->seqid = htons(1);
 	
 
 
