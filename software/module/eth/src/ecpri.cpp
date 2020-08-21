@@ -172,6 +172,16 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	eh->ether_type = htons(ETHER_TYPE);
 
 
+	
+	ecpri->proto_rev = 1;
+	ecpri->reserved = 0;
+	ecpri->concatenate = 0;
+	ecpri->message_type = 0; // IQ data type
+	ecpri->payload_size = htons(sizeStruct);
+	ecpri->rtcid_pcid = 1;
+	ecpri->seqid = 1;
+	
+
 
 	sock_addr.sll_ifindex = if_index;
 	sock_addr.sll_halen = ETH_ALEN;

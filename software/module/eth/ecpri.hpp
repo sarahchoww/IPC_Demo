@@ -27,7 +27,7 @@
 
 #define SENDER_IF	"lo"
 #define RECEIVER_IF "enp1s0"
-#define ETHER_TYPE 0x80ab /* custom type */
+#define ETHER_TYPE 0xaefe /* ECPRI */
 
 #define BUF_SIZ		1024
 
