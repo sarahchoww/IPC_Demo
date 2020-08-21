@@ -3,20 +3,8 @@
 Receiver::Receiver(int idValue, uint8_t **data)
 {
     Transfer::setUp(idValue, data);
-    //setUp(data);
 }
 
-int Receiver::setUp(uint8_t **data)
-{
-
-    if ((*data = (uint8_t *)mmap(NULL, sizeof(bitPackCP_t) + sizeof(bitPackUP_t), PROT_READ | PROT_WRITE, MAP_SHARED, fileDir, 0)) == MAP_FAILED)
-    {
-        std::cout << "mmap failed\n";
-        return (RETURN_FAILURE);
-    }
-
-    return (0);
-}
 
 int Receiver::run(memory_data &iterator, uint8_t data[])
 {

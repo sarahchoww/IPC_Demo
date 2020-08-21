@@ -1,86 +1,10 @@
 #include <packet/transfer.hpp>
 
-const char *Transfer::arrangeFiles(std::string fileToArrange, int id, int operation)
-{
-    // Rearrange / append characters and put into const char *
-    // Operation 1 : create file
-    // Operation 2 : delete file
-
-    const char *holderVar;
-
-    if (operation == 1)
-    {
-        fileToArrange.erase(0, 1); // Erase pos 0, len 1 - the backslash
-    }
-
-    char *fileName = new char[fileToArrange.length()];
-
-    holderVar = fileToArrange.c_str(); // Convert string to const char *
-
-    strcpy(fileName, holderVar); // Copy data from holderVar to fileName, now a char *
-
-    if (operation == 1)
-    {
-        const char *charID = (std::to_string(id)).c_str();
-        // Convert ID to const char *
-
-        strcat(fileName, charID); // Add id to end of file name
-
-        return fileName; // Return file name with id
-    }
-    else if (operation == 2)
-    {
-        std::string temp = FILEPATH;                            // Put filepath in a string
-        char edit[temp.length() + strlen(fileName)] = FILEPATH; // Create new char with filepath in it
-        strcat(edit, fileName);                                 // concatenate file path and file name into "edit"
-
-        if (remove(edit) != 0)
-        {
-            std::cout << "remove error on \t\t" << edit << "\n";
-        }
-    }
-
-    return NULL;
-}
 
 int Transfer::setUp(int idValue, uint8_t **data)
 {
-    //semNewDataFile = arrangeFiles(SEM_NEWDATA, idValue, 1);
-    //semReceivedFile = arrangeFiles(SEM_RECEIVED, idValue, 1);
-    //fileID = arrangeFiles(FILENAME, idValue, 1);
 
-    /*
-
-    if ((semNewData = sem_open(semNewDataFile, O_CREAT, 0600, 0)) == SEM_FAILED)
-    {
-        std::cout << "sem new data failed\n";
-        return (RETURN_FAILURE);
-    }
-
-    if ((semReceived = sem_open(semReceivedFile, O_CREAT, 0600, 0)) == SEM_FAILED)
-    {
-        std::cout << "sem received failed\n";
-        return (RETURN_FAILURE);
-    }
-
-
-
-    if ((fileDir = shm_open(fileID, O_CREAT | O_RDWR, 0600)) == -1) // Open and create a file if it does not already exist
-    {
-        std::cout << "file opening error\n";
-        return (RETURN_FAILURE);
-    }
-
-    if ((ftruncate(fileDir, sizeof(struct ether_header) + sizeof(struct ecpri_header) + sizeof(bitPackCP_t) + sizeof(bitPackUP_t))) == -1)
-    {
-        std::cout << "truncate fail\n";
-        return (RETURN_FAILURE);
-    }
-
-*/
-
-
-    printf("mmap1: Address: %p\tValue:  %p\n", &(*data), *data);
+    printf("malloc1: Address: %p\tValue:  %p\n", &(*data), *data);
 
     if ((*data = (uint8_t *)malloc(sizeof(struct ether_header) + sizeof(struct ecpri_header) + sizeof(bitPackCP_t) + sizeof(bitPackUP_t))) == NULL)
     {
@@ -89,19 +13,11 @@ int Transfer::setUp(int idValue, uint8_t **data)
     }
 
     //std::cout << "mmap 2\t" << &(*data) << "\tvalue\t" << *data << std::endl;
-    printf("mmap2: Address: %p\tValue:  %p\n", &(*data), *data);
+    printf("malloc2: Address: %p\tValue:  %p\n", &(*data), *data);
 
     return (0);
 }
 
-
-void Transfer::cleanUpMap(uint8_t data[])
-{
-    if (munmap(data, sizeof(bitPackCP_t) + sizeof(bitPackUP_t)) == -1)
-    {
-        std::cout << "munmap failed\n";
-    }
-}
 
 void Transfer::cleanUpFiles(memory_data &iterator, uint8_t **data)
 {
@@ -110,25 +26,10 @@ void Transfer::cleanUpFiles(memory_data &iterator, uint8_t **data)
 
     useTransport.~Transport();
 
-    //shm_unlink(fileID);
 
-    //sem_close(semNewData);
-    //sem_close(semReceived);
-
-    //arrangeFiles(semNewDataFile, (iterator.id), 2);
-    //arrangeFiles(semReceivedFile, (iterator.id), 2);
 }
 
-/*
-void Transfer::display(uint8_t *data)
-{
-    std::cout << "\nNUMOFPRB: " << data[];
-    std::cout << "\nFRAMEID: " << data[];
-    std::cout << "\nSUBFRAMEID: " << data[];
-    std::cout << "\nSLOTID: " << data[];
-    std::cout << "\nSTARTSYMBID: " << data[] << "\n\n";
-}
-*/
+
 
 // function override, not template
 void Transfer::packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
@@ -184,7 +85,7 @@ int Transfer::passThroughEncode(uint8_t data[])
 
     size_t sizeHeader = sizeof(struct ether_header);
 
-    useEnc.encodeData(data, sizeof(bitPackCP_t) + sizeHeader);
+    useEnc.encodeData(data, sizeof(bitPackCP_t), sizeof(ether_header) + sizeof(ecpri_header));
 
     return (0);
 }

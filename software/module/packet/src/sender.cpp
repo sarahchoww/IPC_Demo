@@ -3,27 +3,8 @@
 Sender::Sender(int idValue, uint8_t **data)
 {
     Transfer::setUp(idValue, data);
-    //setUp(data);
 }
 
-// Setup the sender
-int Sender::setUp(uint8_t **data)
-{
-
-    //std::cout << "mmap 1\t" << &(*data) << "\tvalue\t" << *data << std::endl;
-    printf("mmap1: Address: %p\tValue:  %p\n", &(*data), *data);
-
-    if ((*data = (uint8_t *)malloc(sizeof(struct ether_header) + sizeof(struct ecpri_header) + sizeof(bitPackCP_t) + sizeof(bitPackUP_t))) == NULL)
-    {
-        std::cout << "malloc failed\n";
-        return (RETURN_FAILURE);
-    }
-
-    //std::cout << "mmap 2\t" << &(*data) << "\tvalue\t" << *data << std::endl;
-    printf("mmap2: Address: %p\tValue:  %p\n", &(*data), *data);
-
-    return (0);
-}
 
 int Sender::run(memory_data &iterator, uint8_t data[])
 {

@@ -36,26 +36,19 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
     if (inputType1 == "sender")
     {
 
-        //std::cout << "data before\t" << &data << "\tvalue\t" << data << std::endl;
         printf("BEFORE: Address: %p\tValue:  %p\n", &data, data );
         
         process = new Sender(idValue, &data);
 
-        //std::cout << "data after\t" << &data << "\tvalue\t" << data << std::endl;
         printf("AFTER: Address: %p\tValue:  %p\n", &data, data );
-
-
 
         size_t sizeHeader = sizeof(struct ether_header) + sizeof(struct ecpri_header);
 
-        //std::cout << "size\t" << sizeHeader << "\n";
 
 
         bitPackCP_t *CPstruct = (struct bitPackCP *) (data + sizeHeader); // Write to data, offset by sizeHeader
 
-        CPstruct->dataDirection = 1;
-
-        std::cout << "after config\n";
+        std::cout << "Size of struct\t" <<  sizeof(bitPackCP_t) << std::endl;
 
         bitPackUP_t *UPstruct = (struct bitPackUP *) (data + sizeHeader); 
 

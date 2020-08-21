@@ -71,7 +71,7 @@ protected:
 public:
     bitPackTrans_t *sendTrans;
     int setUpEth(uint8_t data[]);
-    int sendEth(uint8_t data[], size_t size);
+    int sendEth(uint8_t data[], size_t sizeStruct);
 
 
 };
