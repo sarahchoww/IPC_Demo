@@ -3,10 +3,13 @@
 // cVar is for config variables
 // iterator is for message variables
 
-DU::DU(configVars &cVar, memory_data &iterator, bitPack_t *&sendBit)
+void DU::DUsetUp(configVars &cVar, memory_data &iterator)
 {
-    sendBit->sectionType = 1;
-    sendBit->startPrbc = 0; // For now *******
+
+
+    iterator.sectionType = 1;
+
+    iterator.startPrbc = 0; // For now *******
 
     if (cVar.RATtype == "LTE") // LTE
     {
@@ -40,31 +43,25 @@ DU::DU(configVars &cVar, memory_data &iterator, bitPack_t *&sendBit)
     }
 }
 
-int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBit)
+int DU::rotateGrid(memory_data &iterator, Transfer *&process, uint8_t data[], bitPackCP_t *CPstruct, bitPackUP_t *UPstruct)
 {
-    int runResult;
 
+    int runResult;
     for (iterator.frameId = 0; (int)iterator.frameId < numOfFrames; iterator.frameId++)
     {
-        sendBit->frameId = iterator.frameId;
-
         for (iterator.subframeId = 0; (int)iterator.subframeId < numOfSubframes; iterator.subframeId++)
         {
-            sendBit->subframeId = iterator.subframeId;
 
             for (iterator.slotId = 0; (int)iterator.slotId < numOfSlots; iterator.slotId++)
             {
-                sendBit->slotId = iterator.slotId;
 
                 // Send C-Plane message
 
                 for (iterator.startSymbolid = 0; (int)iterator.startSymbolid < numOfSyms; iterator.startSymbolid++)
                 {
-                    // Send U-Plane message;
-                    sendBit->numPrbc = iterator.numPrbc;
+                    // Send U-Plane message;                    
 
-                    sendBit->startSymbolid = iterator.startSymbolid;
-
+                    /*
                     for (int blockPRBc = (int)sendBit->startPrbc; blockPRBc < (int)sendBit->numPrbc; blockPRBc++) // 12 RE per PRB
                     {
                         for (int elePRBc = 0; elePRBc < 12; elePRBc++)
@@ -74,20 +71,86 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, bitPack_t *&sendBi
                             //std::cout << "RESOURCE ELEMENT: " << elePRBc << std::endl;
                         }
                     }
+*/
 
-                    runResult = process->run(iterator, sendBit);
-                    if (runResult == 1) // Failed
+std::cout << "\nDATADIR: " << iterator.dataDirection;
+std::cout << "\nPAYLOADVER: " << iterator.payloadVersion;
+std::cout << "\nFILTERINDEX: " << iterator.filterIndex;
+std::cout << "\nFRAMEID: " << iterator.frameId;
+std::cout << "\nSUBFRAMEID: " << iterator.subframeId;
+std::cout << "\nSLOTID: " << iterator.slotId;
+std::cout << "\nSTARTSYMBID: " << iterator.startSymbolid;
+
+std::cout << "\nNUMOFSECTIONS: " << iterator.numberOfsections;
+std::cout << "\nSECTIONTYPE: " << iterator.sectionType;
+
+std::cout << "\nudcomphdr: " << iterator.udCompHdr;
+std::cout << "\nreserved: " << iterator.reserved;
+std::cout << "\nrb: " << iterator.rb;
+std::cout << "\nsyminc: " << iterator.symInc;
+std::cout << "\nstartprbc: " << iterator.startPrbc;
+
+
+    std::cout << "\nNUMOFPRB: " << iterator.numPrbc;
+
+std::cout << "\nremask: " << iterator.reMask;
+std::cout << "\nnumsymbol: " << iterator.numSymbol;
+std::cout << "\nef: " << iterator.ef;
+std::cout << "\nbeamid: " << iterator.beamId << "\n\n";
+
+
+
+
+                    runResult = process->run(iterator, data);
+                    if (runResult == RETURN_FAILURE) // Failed
                     {
                         std::cout << "run failed\n";
-                        return (1);
+                        return (RETURN_FAILURE);
                     }
-                    else if (runResult == 2) // Timed out
+                    else if (runResult == RETURN_TIMEDOUT) // Timed out
                     {
-                        return (0);
+                        return (RETURN_TIMEDOUT);
                     }
+
+
+
+                    useTransfer->packCP(data, iterator, CPstruct, UPstruct);
+
+                    if ((useTransfer->passThroughEncode(data)) == RETURN_FAILURE)
+                    {
+                        return (RETURN_FAILURE);
+                    }
+
+                    if ((useTransfer->passThroughEth(data)) == RETURN_FAILURE)
+                    {
+                        return (RETURN_FAILURE);
+                    }
+
+
+                    // Pack after display output so data isn't skewed, this will be removed later
                 }
             }
         }
     }
     return (0);
 }
+
+/*
+unsigned int DU::swapBits(unsigned int &num) // For unsigned int values
+{
+    std::cout << "value\t" << std::dec << (num) << std::endl;
+
+    std::bitset<8> x(num);
+    std::cout << "before\t" << x << std::endl;
+
+    num = (num >> 4) | (num << 4);
+    num = ((num & 0xCC) >> 2) | ((num & 0x33) << 2);
+    num = ((num & 0xAA) >> 1) | ((num & 0x55) << 1);
+
+    x = num;
+    std::cout << "after\t" << x << std::endl;
+
+    std::cout << std::endl;
+    return (num);
+}
+*/
