@@ -12,7 +12,6 @@ int Transfer::setUp(int idValue, uint8_t **data)
         return (RETURN_FAILURE);
     }
 
-    //std::cout << "mmap 2\t" << &(*data) << "\tvalue\t" << *data << std::endl;
     printf("malloc2: Address: %p\tValue:  %p\n", &(*data), *data);
 
     return (0);
@@ -82,8 +81,6 @@ int Transfer::passThroughEncode(uint8_t data[])
         }
     }
 */
-
-    size_t sizeHeader = sizeof(struct ether_header);
 
     useEnc.encodeData(data, sizeof(bitPackCP_t), sizeof(ether_header) + sizeof(ecpri_header));
 
