@@ -45,9 +45,6 @@ protected:
     const char * fileID;
 
 
-    //char data[1024]; // For both CP and UP
-    //bitPackUP_t *UPstruct = (struct bitPackUP *) data; // Access UP data but point to data
-
     Encode useEnc;
     Transport useTransport;
 
@@ -57,10 +54,7 @@ public:
 
     int setUp(int idValue, uint8_t **data);
     virtual int run(memory_data &iterator, uint8_t data[]) = 0;
-    void display(uint8_t *data);
 
-    const char * arrangeFiles(std::string fileToArrange, int id, int operation);
-    void cleanUpMap(uint8_t data[]);
     void cleanUpFiles(memory_data &iterator, uint8_t **data);
 
     void packCP(uint8_t data[], memory_data &iterator, bitPackCP_t *CPstruct, bitPackUP_t *UPstruct);
