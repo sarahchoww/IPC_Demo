@@ -52,24 +52,7 @@ struct ecpri_header
 
 class Transport
 {
-protected:
-    struct transConfig
-    {
-        unsigned int ecpriVersion;
-        unsigned int ecpriReserved;
-        bool ecpriConcatenation;
-        unsigned int ecpriMessage;
-        unsigned int ecpriPayload;
-        unsigned int ecpriRtcidPcid;
-        unsigned int ecpriSeqid;
-    };
-
-
-
-
-
 public:
-    bitPackTrans_t *sendTrans;
     int setUpEth(uint8_t data[]);
     int sendEth(uint8_t data[], size_t sizeStruct);
 

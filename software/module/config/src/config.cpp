@@ -10,15 +10,13 @@ class DU;
 int Config::type(Transfer *&process, char *argv[]) // Change reference to a pointer
 {
 
+
     setToZero();
-
-
 
     // Convert argv[1] to a string by copying it
     std::string inputType1(argv[1]);
     bool idFail;
     sendBit = &sendBitNorm; // To properly access the struct members
-
 
     libconfig::Config cfg;
     cfg.setIncludeDir("software/bin");
@@ -32,46 +30,31 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
         return (RETURN_FAILURE);
     }
 
-
     if (inputType1 == "sender")
     {
-
-        printf("BEFORE: Address: %p\tValue:  %p\n", &data, data );
-        
         process = new Sender(idValue, &data);
-
-        printf("AFTER: Address: %p\tValue:  %p\n", &data, data );
-
+        
         size_t sizeHeader = sizeof(struct ether_header) + sizeof(struct ecpri_header);
 
+        bitPackCP_t *CPstruct = (struct bitPackCP *)(data + sizeHeader); // Write to data, offset by sizeHeader
 
-
-        bitPackCP_t *CPstruct = (struct bitPackCP *) (data + sizeHeader); // Write to data, offset by sizeHeader
-
-        std::cout << "Size of struct\t" <<  sizeof(bitPackCP_t) << std::endl;
-
-        bitPackUP_t *UPstruct = (struct bitPackUP *) (data + sizeHeader); 
-
-        printf("pointer1: %p\t pointer2:  %p\t pointer 3: %p\n", CPstruct, UPstruct, data );
-
-
+        bitPackUP_t *UPstruct = (struct bitPackUP *)(data + sizeHeader);
 
         if (configDU() == RETURN_FAILURE)
         {
             std::cout << "configDU failed\n";
-            return(RETURN_FAILURE);
+            return (RETURN_FAILURE);
         }
         Config *useDU = new DU();
 
         useDU->DUsetUp(cVar, iterator);
 
-
         if ((useDU->rotateGrid(iterator, process, data, CPstruct, UPstruct)) == RETURN_TIMEDOUT)
         {
             delete useDU;
-            return(0);
+            return (0);
         }
- 
+
         delete useDU;
     }
     else if (inputType1 == "receiver")
@@ -86,15 +69,14 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
             if (result == RETURN_FAILURE)
             {
                 std::cout << "run failed\n";
-                return(RETURN_FAILURE);
+                return (RETURN_FAILURE);
             }
             else if (result == RETURN_TIMEDOUT)
             {
                 // Not a failure, but exit out of loop
-                
+
                 return (0);
             }
-            
         }
     }
     else
@@ -119,7 +101,6 @@ int Config::configDU()
         return (RETURN_FAILURE);
     }
 
-
     accessFile(cfg, "dataDirection", iterator.dataDirection);
     accessFile(cfg, "payloadVersion", iterator.payloadVersion);
 
@@ -132,11 +113,12 @@ int Config::configDU()
     accessFile(cfg, "bandwidth", cVar.bandwidth);
     accessFile(cfg, "prefixType", cVar.prefixType);
 
-    return(0);
+    return (0);
 }
 
 bool Config::configID()
 {
+
     try
     {
         cfg.readFile("config/configID.cfg");
@@ -185,4 +167,13 @@ void Config::setToZero()
     iterator.numSymbol = 0;
     iterator.ef = 0;
     iterator.beamId = 0;
+
+    // U-Plane
+
+    iterator.symbolId = 0;
+    iterator.startPrbu = 0;
+    iterator.numPrbu = 0;
+
+    
+
 }

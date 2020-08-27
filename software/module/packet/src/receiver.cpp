@@ -81,7 +81,7 @@ int Receiver::run(memory_data &iterator, uint8_t data[])
                 eh->ether_dhost[4],
                 eh->ether_dhost[5]);
 
-        passThroughEncode(buf);
+        passThroughEncode(buf, sizeof(bitPackUP_t)); // Pass size of U-Plane struct, bigger of the two
 
     }
 

@@ -69,7 +69,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	ecpri->reserved = 0;
 	ecpri->concatenate = 0;
 	ecpri->message_type = 0; // IQ data type
-	ecpri->payload_size = htons(sizeStruct);
+	ecpri->payload_size = htons(sizeStruct + 4); // Add 4 bytes to account / offset for RTCID and SeqId in payload
 	ecpri->rtcid_pcid = htons(1);
 	ecpri->seqid = htons(1);
 	
@@ -78,6 +78,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	sock_addr.sll_ifindex = if_index;
 	sock_addr.sll_halen = ETH_ALEN;
 	memcpy(sock_addr.sll_addr, dest_addr, ETH_ALEN);
+
 
 	if (sendto(socketFileDir, data, totalSize, 0, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0)
 	{
