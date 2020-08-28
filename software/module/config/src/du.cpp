@@ -59,16 +59,18 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, uint8_t data[], bi
 
                     for (iterator.startSymbolid = 0; iterator.startSymbolid < iterator.numSymbol; iterator.startSymbolid++) // Won't always start at 0
                     {
-
-                        // can have multiple U-Plane messages per C-Plane message
-
+                        // CP packet
                         std::cout << "sending CP\n";
                         sendData(iterator, process, data, CPstruct);
+// First CP message sent has a skewed header
+
+
 
                         for (iterator.startPrbu = 0; iterator.startPrbu < iterator.numPrbu; iterator.startPrbu++) // UP PRB
                         {
                             for (iterator.symbolId = 0; iterator.symbolId < 12; iterator.symbolId++) // UP Symbols
                             {
+                                // IQ data is currently two randomly generated values
                                 genIQData();
 
                                 iterator.iSample = iData;
@@ -107,9 +109,13 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, uint8_t data[], bi
                                 std::cout << "\n STARTPRBU: " << iterator.startPrbu;
                                 std::cout << "\n NUMPRBU: " << iterator.numPrbu << "\n\n";
 
+                                // UP packet
                                 sendData(iterator, process, data, UPstruct);
                             }
                         }
+
+
+
                     }
                 }
             }
@@ -123,7 +129,7 @@ int DU::sendData(memory_data &iterator, Transfer *&process, uint8_t data[], bitP
 {
     int runResult;
 
-    runResult = process->run(iterator, data);
+    runResult = process->run(iterator, data); // 0.5 second delay
     if (runResult == RETURN_FAILURE) // Failed
     {
         std::cout << "run failed\n";
@@ -134,14 +140,17 @@ int DU::sendData(memory_data &iterator, Transfer *&process, uint8_t data[], bitP
         return (RETURN_TIMEDOUT);
     }
 
-    useTransfer->packStruct(data, iterator, planeStruct);
+    // Set values from iterator to the appropriate structure values
+    useTransfer->packStruct(data, iterator, planeStruct); // Assign values to struct
 
+    // LSB to MSB
     if ((useTransfer->passThroughEncode(data, sizeof(bitPackCP_t))) == RETURN_FAILURE)
     {
         return (RETURN_FAILURE);
     }
 
-    if ((useTransfer->passThroughEth(data, sizeof(bitPackCP_t))) == RETURN_FAILURE)
+    // Create header and send over
+    if ((useTransfer->passThroughEth(data, sizeof(bitPackCP_t), 2)) == RETURN_FAILURE)
     {
         return (RETURN_FAILURE);
     }
@@ -172,7 +181,7 @@ int DU::sendData(memory_data &iterator, Transfer *&process, uint8_t data[], bitP
         return (RETURN_FAILURE);
     }
 
-    if ((useTransfer->passThroughEth(data, sizeof(bitPackUP_t))) == RETURN_FAILURE)
+    if ((useTransfer->passThroughEth(data, sizeof(bitPackUP_t), 0)) == RETURN_FAILURE)
     {
         return (RETURN_FAILURE);
     }

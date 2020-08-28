@@ -54,7 +54,7 @@ class Transport
 {
 public:
     int setUpEth(uint8_t data[]);
-    int sendEth(uint8_t data[], size_t sizeStruct);
+    int sendEth(uint8_t data[], size_t sizeStruct, int msg_type);
 
 
 };

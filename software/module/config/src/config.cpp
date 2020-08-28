@@ -23,7 +23,7 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
 
     int result; // For the status of receiver
 
-    // Get ID
+    // Get ID - needed?
     if ((idFail = configID()) == true)
     {
         std::cout << "ID error\n";
@@ -59,7 +59,6 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
     }
     else if (inputType1 == "receiver")
     {
-
         process = new Receiver(idValue, &data);
 
         while (true)

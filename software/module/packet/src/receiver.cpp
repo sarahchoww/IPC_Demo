@@ -56,6 +56,7 @@ int Receiver::run(memory_data &iterator, uint8_t data[])
         return EXIT_FAILURE;
     }
 
+    // Infinite loop
     while (1)
     {
         struct ether_header *eh = (struct ether_header *)buf;

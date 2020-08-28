@@ -76,16 +76,14 @@ void Transfer::packStruct(uint8_t data[], memory_data &iterator, bitPackUP_t *UP
 
 int Transfer::passThroughEncode(uint8_t data[], size_t size)
 {
-    // Function overload
     useEnc.encodeData(data, size, sizeof(ether_header) + sizeof(ecpri_header));
 
     return (0);
 }
 
-// Fusnction overload
-int Transfer::passThroughEth(uint8_t data[], size_t size)
+int Transfer::passThroughEth(uint8_t data[], size_t size, int msg_type)
 {
-    if (useTransport.sendEth(data, size) == 1)
+    if (useTransport.sendEth(data, size, msg_type) == 1)
     {
         return (RETURN_FAILURE);
     }

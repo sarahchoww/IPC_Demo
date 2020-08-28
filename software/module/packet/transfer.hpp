@@ -36,7 +36,7 @@ public:
 
 
     int passThroughEncode(uint8_t data[], size_t size);
-    int passThroughEth(uint8_t data[], size_t size);
+    int passThroughEth(uint8_t data[], size_t size, int msg_type);
 
 
 };

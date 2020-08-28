@@ -1,6 +1,6 @@
 #include <eth/ecpri.hpp>
 
-int Transport::sendEth(uint8_t data[], size_t sizeStruct)
+int Transport::sendEth(uint8_t data[], size_t sizeStruct, int msg_type)
 {
 	char *interfaceName;
 	int socketFileDir;
@@ -68,7 +68,7 @@ int Transport::sendEth(uint8_t data[], size_t sizeStruct)
 	ecpri->proto_rev = 1;
 	ecpri->reserved = 0;
 	ecpri->concatenate = 0;
-	ecpri->message_type = 0; // IQ data type
+	ecpri->message_type = msg_type; // IQ data type
 	ecpri->payload_size = htons(sizeStruct + 4); // Add 4 bytes to account / offset for RTCID and SeqId in payload
 	ecpri->rtcid_pcid = htons(1);
 	ecpri->seqid = htons(1);
