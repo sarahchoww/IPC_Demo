@@ -17,7 +17,7 @@
 
 #include <unistd.h>
 
-
+// Configure to own address
 #define DEST_MAC0	0xa4
 #define DEST_MAC1	0xbb
 #define DEST_MAC2	0x6d

@@ -69,8 +69,14 @@ int DU::rotateGrid(memory_data &iterator, Transfer *&process, uint8_t data[], bi
                         {
                             for (iterator.symbolId = 0; iterator.symbolId < 12; iterator.symbolId++) // UP Symbols
                             {
-                                std::cout << "sending UP\n";
+                                genIQData();
 
+                                iterator.iSample = iData;
+                                iterator.qSample = qData;
+
+                                std::cout << "iq data\t" << iterator.iSample << "\t" << iterator.qSample << std::endl;
+
+                                std::cout << "sending UP\n";
 
                                 std::cout << "\nDATADIR: " << iterator.dataDirection;
                                 std::cout << "\nPAYLOADVER: " << iterator.payloadVersion;
@@ -172,4 +178,10 @@ int DU::sendData(memory_data &iterator, Transfer *&process, uint8_t data[], bitP
     }
 
     return (0);
+}
+
+void DU::genIQData()
+{
+    iData = (rand() % 100);
+    qData = (rand() % 100);
 }

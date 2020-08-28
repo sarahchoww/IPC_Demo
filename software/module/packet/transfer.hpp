@@ -8,7 +8,6 @@
 #include <signal.h> // For ctrl-c
 #include <cstring>
 
-#include <utility> // pair
 #include <linux/if_ether.h> // socket
 #include <sys/socket.h> // socket
 

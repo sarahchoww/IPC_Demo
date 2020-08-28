@@ -29,6 +29,8 @@ struct memory_data
     unsigned int symbolId;
     unsigned int startPrbu;
     unsigned int numPrbu;
+    signed int iSample; // size varies, array
+    signed int qSample; // size varies, array
 };
 
 #pragma pack(push, 1)

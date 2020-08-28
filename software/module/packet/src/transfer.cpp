@@ -67,6 +67,8 @@ void Transfer::packStruct(uint8_t data[], memory_data &iterator, bitPackUP_t *UP
     UPstruct->numPrbu = iterator.numPrbu;
     UPstruct->udCompHdr = iterator.udCompHdr;
     UPstruct->reserved = iterator.reserved;
+    UPstruct->iSample = iterator.iSample;
+    UPstruct->qSample = iterator.qSample;
     
 }
 
@@ -74,50 +76,6 @@ void Transfer::packStruct(uint8_t data[], memory_data &iterator, bitPackUP_t *UP
 
 int Transfer::passThroughEncode(uint8_t data[], size_t size)
 {
-
-/*
-    // Make dummyIQ
-    int num;
-    char buf[20];
-
-    for (int i = 0; i < 20; i++)
-    {
-
-        num = rand() % 100;
-
-        buf[i] = 0b00110000;
-
-        if ((num % 15) == 0) // Space
-        {
-            buf[i] = 0b00100000;
-        }
-
-        if (i % 5 == 0) // New line every 4th
-        {
-            buf[i] = 0b00001010;
-        }
-    }
-
-    std::cout << buf;
-
-*/
-
-/*
-    for (int i = 0; i < 20; i++)
-    {
-        float num1, num2;
-
-        num1 = (rand() % 10) / 100; // Between 0 and 10, divide by 100 for decimal
-        num2 = (rand() % 10) / 100;
-
-        std::pair <std::float,float> newPair (num1, num2);  
-    }
-
-    std::pair <std::float, float> arrIQ[20];  
-*/
-    
-
-
     // Function overload
     useEnc.encodeData(data, size, sizeof(ether_header) + sizeof(ecpri_header));
 

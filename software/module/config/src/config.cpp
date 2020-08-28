@@ -33,7 +33,7 @@ int Config::type(Transfer *&process, char *argv[]) // Change reference to a poin
     if (inputType1 == "sender")
     {
         process = new Sender(idValue, &data);
-        
+
         size_t sizeHeader = sizeof(struct ether_header) + sizeof(struct ecpri_header);
 
         bitPackCP_t *CPstruct = (struct bitPackCP *)(data + sizeHeader); // Write to data, offset by sizeHeader
@@ -118,7 +118,6 @@ int Config::configDU()
 
 bool Config::configID()
 {
-
     try
     {
         cfg.readFile("config/configID.cfg");
@@ -128,7 +127,6 @@ bool Config::configID()
         std::cerr << e.what() << '\n';
         return true;
     }
-
     // Name
     try
     {
