@@ -25,6 +25,12 @@ struct memory_data
     int ef;
     unsigned int beamId;    
 
+    // U-PLane
+    unsigned int symbolId;
+    unsigned int startPrbu;
+    unsigned int numPrbu;
+    signed int iSample; // size varies, array
+    signed int qSample; // size varies, array
 };
 
 #pragma pack(push, 1)
@@ -78,18 +84,4 @@ typedef struct bitPackUP
     signed int iSample : 16; // size varies, array
     signed int qSample : 16; // size varies, array
 } bitPackUP_t;
-#pragma pack(pop)
-
-
-#pragma pack(push, 1)
-typedef struct bitPackTrans
-{
-    unsigned int ecpriVersion : 4;
-    unsigned int ecpriReserved : 3;
-    int ecpriConcatenation : 1;
-    unsigned int ecpriMessage : 8;
-    unsigned int ecpriPayload : 16;
-    unsigned int ecpriRtcidPcid : 16;
-    unsigned int ecpriSeqid : 16;
-} bitPackTrans_t;
 #pragma pack(pop)

@@ -17,7 +17,7 @@
 
 #include <unistd.h>
 
-
+// Configure to own address
 #define DEST_MAC0	0xa4
 #define DEST_MAC1	0xbb
 #define DEST_MAC2	0x6d
@@ -52,26 +52,9 @@ struct ecpri_header
 
 class Transport
 {
-protected:
-    struct transConfig
-    {
-        unsigned int ecpriVersion;
-        unsigned int ecpriReserved;
-        bool ecpriConcatenation;
-        unsigned int ecpriMessage;
-        unsigned int ecpriPayload;
-        unsigned int ecpriRtcidPcid;
-        unsigned int ecpriSeqid;
-    };
-
-
-
-
-
 public:
-    bitPackTrans_t *sendTrans;
     int setUpEth(uint8_t data[]);
-    int sendEth(uint8_t data[], size_t sizeStruct);
+    int sendEth(uint8_t data[], size_t sizeStruct, int msg_type);
 
 
 };

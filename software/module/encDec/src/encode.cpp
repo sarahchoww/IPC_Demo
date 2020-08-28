@@ -17,7 +17,7 @@ void Encode::encodeData(uint8_t data[], size_t sizeData, size_t sizeGap)
 
         data[newSize] = x;
 
-
+        // For outputting / testing purposes
         std::string binary2 = std::bitset<8>(data[newSize]).to_string(); //to binary
         std::cout << binary2 <<" ";
 
